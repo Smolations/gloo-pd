@@ -40,7 +40,6 @@ export default class Login extends React.Component {
       padding: 20,
       margin: '20px auto 20px',
       textAlign: 'center',
-      // display: 'inline-block',
     };
 
     return (

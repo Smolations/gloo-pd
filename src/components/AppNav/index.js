@@ -13,6 +13,7 @@ export default class AppNav extends React.Component {
       <AppBar
         title="Dam Jena - Harnessing Growth Energy"
         iconElementRight={Session.session.isGuest === false ? <NavLogoutButton/> : <NavLoginButton/>}
+        showMenuIconButton={false}
       />
     );
   }
