@@ -2,6 +2,7 @@ import _ from 'lodash';
 import store from 'store';
 import polymerApi from './polymer-api';
 
+const v1Header = { headers: { Accept: 'application/vnd.gloo.v1+json', } }
 
 const _session = {
   isGuest: null
@@ -17,7 +18,6 @@ const service = {
 
   authGuest: authGuest,
   authUser: authUser,
-  // authWithToken: authWithToken,
   destroy: destroy,
   getCurrentUser: getCurrentUser
 };
@@ -34,7 +34,7 @@ _setToken({
  *  @returns Promise(_session)
  */
 function authGuest() {
-  return polymerApi.post('users/create_guest_user')
+  return polymerApi.post('users/create_guest_user', v1Header)
     .then((resp) => {
       _session.isGuest = true;
       _setToken(resp.token);
@@ -51,17 +51,12 @@ function authUser(params) {
     body: Object.assign({}, params, { device_type: 'web' })
   };
 
-  return polymerApi.post('sessions', opts)
+  return polymerApi.post('sessions', Object.assign({}, opts, v1Header))
     .then((resp) => {
       _session.isGuest = false;
       return _setToken(resp.token);
     });
 }
-
-// function authWithToken(tokenObj) {
-//   _session.isGuest = false;
-//   return Promise.resolve(_setToken(tokenObj));
-// }
 
 /**
  *  After destroying a session, creates a new guest user session so that
@@ -70,7 +65,7 @@ function authUser(params) {
  *  @returns promise(session)
  */
 function destroy() {
-  return polymerApi.delete('sessions')
+  return polymerApi.delete('sessions', v1Header)
     .then(() => service.authGuest());
 }
 
@@ -78,7 +73,7 @@ function destroy() {
  *  @returns promise(user)
  */
 function getCurrentUser() {
-  return polymerApi.get('sessions/current_user')
+  return polymerApi.get('sessions/current_user', v1Header)
     .then((resp) => {
       const user = resp.user;
       _setToken({
