@@ -2,7 +2,6 @@ import React from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Redirect,
 } from 'react-router-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
@@ -12,7 +11,6 @@ import Cohorts from './scenes/Cohorts';
 import Home from './scenes/Home';
 import Login from './scenes/Login';
 import PrivateRoute from './components/PrivateRoute';
-import Session from './services/session';
 
 
 export default class Project extends React.Component {
@@ -23,19 +21,14 @@ export default class Project extends React.Component {
         <Router>
           <main>
             <AppNav />
-            <Route exact path="/" component={Home} />
-            <Route path="/login" component={Login} />
-            <PrivateRoute path="/cohorts" component={Cohorts} />
+            <section id="routeContainer">
+              <Route exact path="/" component={Home} />
+              <Route path="/login" component={Login} />
+              <PrivateRoute path="/cohorts" component={Cohorts} />
+            </section>
           </main>
         </Router>
       </MuiThemeProvider>
     );
   }
 };
-            //<Route exact path="/" render={() => (
-            //  (Session.session.isGuest === false) ? (
-            //    <Redirect to="/home"/>
-            //  ) : (
-            //    <Redirect to="/login"/>
-            //  )
-            //)}/>
