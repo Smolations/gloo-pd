@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- Facebook Meta (og:tags) -->
+  <meta property="og:title" content="Gloo" />
+  <meta property="og:description" content="Gloo provides the infrastructure and tool sets that allow you to build your own digital platform uniquely designed for growth." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://polymer.gloo.us/assets/images/og-logo-default.png" />
+
+  <!-- favicons will be added from gloostrap -->
+
+  <base href="/">
+  <title>Gloo</title>
+
+  <!-- mainStyles:css -->
+  <link rel="stylesheet" media="screen" href="/epoxy/dist/main.css">
+  <!-- endinject -->
+  <!-- printStyles:css -->
+  <link rel="stylesheet" media="print" href="/epoxy/dist/print.css">
+  <!-- endinject -->
+
+  <!-- only temporary, will remove once all/majority of users have updated for spa wrapper -->
+  <style>
+    #updateMsg {
+      display:none;
+      height:100%;
+      width:100%;
+      background-color: #f2f2f2;
+      padding-top:1px;
+    }
+    #updateMsg img {
+      display: block;
+      width: 25%;
+      margin: 20rem auto 5rem;
+    }
+    #updateMsg p {
+      width:75%;
+      margin:0 auto;
+    }
+  </style>
+
+  <!-- polyfills -->
+  <!-- https://github.com/mortzdk/localStorage -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/store-js@2.0.4/dist/store.modern.min.js"></script>
+  <!-- https://github.com/stefanpenner/es6-promise -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.0.5/es6-promise.min.js"></script>
+  <!-- https://github.com/github/fetch -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.2/fetch.min.js"></script>
+
+  <!-- loading this here for appsee video captures -->
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+  <script src="/epoxy/dist/epoxy-config.js"></script>
+  <script src="/epoxy/assets/jspm_packages/system.js"></script>
+  <!-- jspmConfig:js -->
+  <script src="/epoxy/jspm.config.js"></script>
+  <!-- endinject -->
+
+  <!-- systemDefineShim:js -->
+  <script>
+window.define = System.amdDefine;
+window.require = window.requirejs = System.amdRequire;
+  </script>
+
+  <!-- endinject -->
+  <!-- systemTransform:js -->
+  <!-- endinject -->
+
+  <!-- build:js -->
+  <!-- endinject -->
+
+  <!-- deps:js -->
+  <script src="/epoxy/dist/deps.43fd76adfdadc1953732cac9d349d6241a1ec928.js"></script>
+  <!-- endinject -->
+</head>
+
+<body ng-app="epoxy">
+  <div id="epoxyApp" ui-view>
+  </div>
+
+  <div id="splashLoader">
+    <svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <g id="iOS-Selects" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="iOS_A01_Landing-Copy-4" transform="translate(-171.000000, -321.000000)" fill="#333333">
+          <g id="Group" transform="translate(171.000000, 321.000000)">
+            <circle id="Oval" cx="4.875" cy="4.875" r="4.875"></circle>
+            <circle id="Oval-Copy" cx="21.125" cy="4.875" r="4.875"></circle>
+            <circle id="Oval-Copy-3" cx="4.875" cy="21.125" r="4.875"></circle>
+            <circle id="Oval-Copy-2" cx="21.125" cy="21.125" r="4.875"></circle>
+          </g>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <div id="uiLock"></div>
+
+  <!-- templates:html -->
+  <!-- endinject -->
+
+  <!-- bootstrap:js -->
+  <script src="/epoxy/lib/gloostrap.js"></script>
+  <!-- endinject -->
+</body>
+
+</html>
