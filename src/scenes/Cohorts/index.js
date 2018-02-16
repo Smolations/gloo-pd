@@ -1,11 +1,11 @@
 import React from 'react';
 
+import Avatar from 'material-ui/Avatar';
 import MenuItem from 'material-ui/MenuItem';
 import SelectField from 'material-ui/SelectField';
 
 import CohortList from './components/CohortList';
 
-import Session from '../../services/session';
 import polymerApi from '../../services/polymer-api';
 
 
@@ -31,17 +31,25 @@ export default class Cohorts extends React.Component {
     console.warn('Cohorts render()');
 
     const champMenuItems = this.state.champions.map(champ =>
-      <MenuItem key={champ.id} value={champ.id} primaryText={champ.name} />
+      <MenuItem
+        key={champ.id}
+        value={champ.id}
+        primaryText={champ.name}
+        leftIcon={<Avatar src={champ.icon_url} />}
+      />
     );
+
+    // force selected item to show as it does in the dropdown--with an avatar
+    const selectionRenderer = (value, menuItem) => menuItem;
 
     return (
       <section>
         <p>Here you can view a list of your cohorts, filtered by Champion.</p>
         <SelectField
-          floatingLabelText="Champion"
           value={this.state.currentChampId}
           onChange={this.handleChange}
           autoWidth={true}
+          selectionRenderer={selectionRenderer}
         >
           {champMenuItems}
         </SelectField>
