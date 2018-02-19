@@ -6,11 +6,10 @@ import Divider from 'material-ui/Divider';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 
-// import NavDrawer from './components/NavDrawer';
 import NavLoginButton from './components/NavLoginButton';
 import NavLogoutButton from './components/NavLogoutButton';
 
-import Session from '../../services/session';
+import Session from 'services/session';
 
 
 class AppNavRouterless extends React.Component {

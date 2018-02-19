@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  withRouter,
+} from 'react-router-dom';
 
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -18,6 +21,7 @@ class CohortOverflow extends React.Component {
 
   render() {
     console.warn('CohortList render()');
+    const { history } = this.props;
     const usersDialogActions = [
       <FlatButton
         label="OK"
@@ -26,19 +30,19 @@ class CohortOverflow extends React.Component {
       />,
     ];
 
-    // const growthActionsDialogActions = [
-    //   <FlatButton
-    //     label="Cancel"
-    //     primary={true}
-    //     onClick={this.handleClose}
-    //   />,
-    //   <FlatButton
-    //     label="Submit"
-    //     primary={true}
-    //     keyboardFocused={true}
-    //     onClick={this.handleClose}
-    //   />,
-    // ];
+    const growthActionsDialogActions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onClick={() => this.handleClose('growthActions')}
+      />,
+      <FlatButton
+        label="Submit"
+        primary={true}
+        keyboardFocused={true}
+        onClick={() => this.handleClose('growthActions')}
+      />,
+    ];
 
     // need the dialog to have access to the list of users in a given cohort.
     // in order to have the users fetched for a *single* cohort when the
@@ -60,7 +64,7 @@ class CohortOverflow extends React.Component {
           <MenuItem
             disabled={this.props.cohort.cohort_users_count === 0}
             primaryText="Assign Growth Action"
-            onClick={() => this.handleOpen('growthActions')}
+            onClick={() => history.push(`/cohorts/${this.props.cohort.id}`)}
           />
         </IconMenu>
 
@@ -73,6 +77,16 @@ class CohortOverflow extends React.Component {
           autoScrollBodyContent={true}
         >
           <CohortUsersList cohort={this.props.cohort} />
+        </Dialog>
+        <Dialog
+          title={`Assign Growth Action to users in ${this.props.cohort.name}`}
+          actions={growthActionsDialogActions}
+          modal={false}
+          open={this.state.growthActionsDialogOpen}
+          onRequestClose={() => this.handleClose('growthActions')}
+          autoScrollBodyContent={true}
+        >
+          <CohortUsersList cohort={this.props.cohort.id} />
         </Dialog>
       </aside>
     );
@@ -101,4 +115,6 @@ class CohortOverflow extends React.Component {
   };
 }
 
-export default CohortOverflow;
+// const CohortOverflow = withRouter(CohortOverflowRouterless);
+
+export default withRouter(CohortOverflow);

@@ -11,7 +11,7 @@ import {
 
 import CohortOverflow from './CohortOverflow';
 
-import polymerApi from '../../../services/polymer-api';
+import polymerApi from 'services/polymer-api';
 
 
 class CohortList extends React.Component {
@@ -39,14 +39,14 @@ class CohortList extends React.Component {
 
     return (
       <Table headerStyle={tableStyles}>
-        <TableHeader>
+        <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
           <TableRow>
             <TableHeaderColumn>Cohort Name</TableHeaderColumn>
             <TableHeaderColumn>User Count</TableHeaderColumn>
             <TableHeaderColumn>Actions</TableHeaderColumn>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody displayRowCheckbox={false}>
           {cohorts}
         </TableBody>
       </Table>

@@ -5,13 +5,15 @@ import {
 } from 'react-router-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-import AppNav from './components/AppNav';
+import AppNav from 'components/AppNav';
 
-import Cohorts from './scenes/Cohorts';
-import Home from './scenes/Home';
-import Login from './scenes/Login';
-import PrivateRoute from './components/PrivateRoute';
+import Cohorts from 'scenes/Cohorts';
+import Home from 'scenes/Home';
+import Login from 'scenes/Login';
+import PrivateRoute from 'components/PrivateRoute';
 
+
+// smola jr:  441201
 
 export default class Project extends React.Component {
   render() {

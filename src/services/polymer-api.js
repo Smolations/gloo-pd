@@ -17,7 +17,8 @@ const fetcher = (method) => {
     if (fetchOpts.body) {
       fetchOpts.body = JSON.stringify(fetchOpts.body);
     }
-    return fetch(`https://polymer.gloo.us/api/${uri}`, fetchOpts)
+    // return fetch(`https://polymer.gloo.us/api/${uri}`, fetchOpts)
+    return fetch(`https://polymer-qa8.dev.gloo.us/api/${uri}`, fetchOpts)
       .then((res) => {
         if (res.ok) {
           return parseJSON(res);

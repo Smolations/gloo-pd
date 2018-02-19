@@ -6,7 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 
-import Session from '../../services/session';
+import Session from 'services/session';
 
 
 export default class Login extends React.Component {
