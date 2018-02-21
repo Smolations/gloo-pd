@@ -15,6 +15,8 @@ export default class CohortsSingle extends React.Component {
   state = {
     cohort: null,
     open: false,
+
+    selectedUsers: [],
   };
 
   componentDidMount() {
@@ -38,12 +40,26 @@ export default class CohortsSingle extends React.Component {
           <div>
             <RaisedButton primary={true} label="Assign Growth Action" onClick={() => {this.setState({ open: true })}}/>
           </div>
-          <CohortUsersList cohortId={this.state.cohort.id} growthRelationshipStatus={true} />
-          <AssignGrowthAction open={this.state.open} />
+          <CohortUsersList
+            cohortId={this.state.cohort.id}
+            growthRelationshipStatus={true}
+            preSelected={true}
+            onSelect={this.handleCohortUsersSelect}
+          />
+          <AssignGrowthAction
+            open={this.state.open}
+            assignees={this.state.selectedUsers}
+            onFinish={() => {}}
+          />
         </div>
       )
       : (
         <p>Loading...</p>
       );
+  }
+
+  handleCohortUsersSelect = (users) => {
+    console.log('handleCohortUsersSelect(%o)', users);
+    this.setState({ selectedUsers: users });
   }
 }

@@ -32,12 +32,15 @@ class CohortUsersList extends React.Component {
     polymerApi.get(`cohorts/${this.props.cohortId}/users`)
       .then((resp) => {
         console.log('CohortUsersList cohort users: %o', resp);
-        // this.setState({ users: resp.content });
         return resp.content;
       })
       .then((users) => {
         return Promise.all(users.map((user) => {
-          return polymerApi.get('my/growth_relationships/as_agent?q='+user.username)
+          const queryParams = new URLSearchParams({
+            q: user.username,
+          });
+
+          return polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`)
             .then((resp) => resp.content)
             .then((relationships) => (user.growth_relationships = relationships))
             .then(() => user);
@@ -46,6 +49,13 @@ class CohortUsersList extends React.Component {
       .then((users) => {
         console.warn(users);
         this.setState({ users });
+
+        // preselecting all rows via table prop does not call the
+        // callback indicating as much. the setState call above MUST
+        // come first!
+        if (this.props.preSelected) {
+          this.handleRowSelect('all');
+        }
       })
   }
 
@@ -55,6 +65,7 @@ class CohortUsersList extends React.Component {
     console.warn('CohortUsersList render()');
 
     const avatarColumnStyles = { width: '40px' };
+    const centerColumnStyles = { textAlign: 'center' };
 
     const userRows = this.state.users.map(user =>
       <TableRow key={user.id}>
@@ -62,23 +73,30 @@ class CohortUsersList extends React.Component {
         <TableRowColumn>{`${user.first_name} ${user.last_name}`}</TableRowColumn>
         <TableRowColumn>{user.username}</TableRowColumn>
         <TableRowColumn>{user.email}</TableRowColumn>
-        {this.props.growthRelationshipStatus && <TableRowColumn style={{textAlign:'center'}}>{user.growth_relationships.length ? <MaterialIcon name="local_florist" color="green"/> : <MaterialIcon name="local_florist"/>}</TableRowColumn>}
+        {this.props.growthRelationshipStatus && <TableRowColumn style={centerColumnStyles}>{user.growth_relationships.length ? <MaterialIcon name="local_florist" color="green"/> : <MaterialIcon name="local_florist"/>}</TableRowColumn>}
       </TableRow>
     );
 
     // first column will show avatar, so no header needed
     return (
-      <Table onRowSelection={this.handleRowSelect} multiSelectable={!!this.props.onSelect}>
-        <TableHeader adjustForCheckbox={!!this.props.onSelect} displaySelectAll={!!this.props.onSelect}>
+      <Table
+        onRowSelection={this.handleRowSelect}
+        multiSelectable={!!this.props.onSelect || this.props.preSelected}
+        allRowsSelected={this.props.preSelected}
+      >
+        <TableHeader
+          adjustForCheckbox={!!this.props.onSelect}
+          displaySelectAll={!!this.props.onSelect || this.props.preSelected}
+        >
           <TableRow>
             <TableHeaderColumn style={avatarColumnStyles}></TableHeaderColumn>
             <TableHeaderColumn>Name</TableHeaderColumn>
             <TableHeaderColumn>Username</TableHeaderColumn>
             <TableHeaderColumn>Email</TableHeaderColumn>
-            {this.props.growthRelationshipStatus && <TableHeaderColumn style={{textAlign:'center'}}>Growth Relationship Status</TableHeaderColumn>}
+            {this.props.growthRelationshipStatus && <TableHeaderColumn style={centerColumnStyles}>Growth Relationship Status</TableHeaderColumn>}
           </TableRow>
         </TableHeader>
-        <TableBody displayRowCheckbox={!!this.props.onSelect}>
+        <TableBody displayRowCheckbox={!!this.props.onSelect || this.props.preSelected}>
           {userRows}
         </TableBody>
       </Table>
@@ -86,8 +104,10 @@ class CohortUsersList extends React.Component {
   }
 
   handleRowSelect = (rowIndices) => {
+    console.log('CohortUsersList handleRowSelect(%o)', rowIndices)
+    const users = (rowIndices === 'all') ? this.state.users : rowIndices.map(ndx => this.state.users[ndx]);
     if (this.props.onSelect) {
-      this.props.onSelect(rowIndices.map(ndx => this.state.users[ndx]));
+      this.props.onSelect(users);
     }
   }
 }
