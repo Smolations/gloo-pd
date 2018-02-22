@@ -38,18 +38,22 @@ export default class CohortsSingle extends React.Component {
         <div>
           <p>Current Cohort: {this.state.cohort.name}</p>
           <div>
-            <RaisedButton primary={true} label="Assign Growth Action" onClick={() => {this.setState({ open: true })}}/>
+            <RaisedButton
+              primary={true}
+              label="Assign Growth Action"
+              onClick={() => {this.setState({ open: true })}}
+            />
           </div>
           <CohortUsersList
             cohortId={this.state.cohort.id}
-            growthRelationshipStatus={true}
             preSelected={true}
             onSelect={this.handleCohortUsersSelect}
           />
           <AssignGrowthAction
             open={this.state.open}
             assignees={this.state.selectedUsers}
-            onFinish={() => {}}
+            championId={this.state.cohort.champion_id}
+            onFinish={(growthActions) => { console.log('CohortsSingle onFinish(%o)', growthActions) }}
           />
         </div>
       )

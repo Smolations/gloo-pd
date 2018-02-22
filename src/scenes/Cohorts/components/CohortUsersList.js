@@ -34,18 +34,22 @@ class CohortUsersList extends React.Component {
         console.log('CohortUsersList cohort users: %o', resp);
         return resp.content;
       })
-      .then((users) => {
-        return Promise.all(users.map((user) => {
-          const queryParams = new URLSearchParams({
-            q: user.username,
-          });
+      // .then((users) => {
+      //   return Promise.all(users.map((user) => {
+      //     const queryParams = new URLSearchParams({
+      //       q: user.username,
+      //     });
 
-          return polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`)
-            .then((resp) => resp.content)
-            .then((relationships) => (user.growth_relationships = relationships))
-            .then(() => user);
-        }))
-      })
+      //     return polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`)
+      //       .then((resp) => resp.content)
+      //       .then((relationships) => {
+      //         // not enthused about another component requiring this property
+      //         // on each assignee...maybe come back and fix?
+      //         user.growth_relationships = relationships.filter((relationship) => true)
+      //       })
+      //       .then(() => user);
+      //   }))
+      // })
       .then((users) => {
         console.warn(users);
         this.setState({ users });
@@ -73,7 +77,6 @@ class CohortUsersList extends React.Component {
         <TableRowColumn>{`${user.first_name} ${user.last_name}`}</TableRowColumn>
         <TableRowColumn>{user.username}</TableRowColumn>
         <TableRowColumn>{user.email}</TableRowColumn>
-        {this.props.growthRelationshipStatus && <TableRowColumn style={centerColumnStyles}>{user.growth_relationships.length ? <MaterialIcon name="local_florist" color="green"/> : <MaterialIcon name="local_florist"/>}</TableRowColumn>}
       </TableRow>
     );
 
@@ -93,7 +96,6 @@ class CohortUsersList extends React.Component {
             <TableHeaderColumn>Name</TableHeaderColumn>
             <TableHeaderColumn>Username</TableHeaderColumn>
             <TableHeaderColumn>Email</TableHeaderColumn>
-            {this.props.growthRelationshipStatus && <TableHeaderColumn style={centerColumnStyles}>Growth Relationship Status</TableHeaderColumn>}
           </TableRow>
         </TableHeader>
         <TableBody displayRowCheckbox={!!this.props.onSelect || this.props.preSelected}>
