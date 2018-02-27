@@ -10,7 +10,7 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 
-import MaterialIcon from 'components/MaterialIcon';
+// import MaterialIcon from 'components/MaterialIcon';
 
 import polymerApi from 'services/polymer-api';
 
@@ -22,6 +22,7 @@ import polymerApi from 'services/polymer-api';
 class CohortUsersList extends React.Component {
   state = {
     users: [],
+    selected: [],
   };
 
   componentDidMount() {
@@ -34,32 +35,9 @@ class CohortUsersList extends React.Component {
         console.log('CohortUsersList cohort users: %o', resp);
         return resp.content;
       })
-      // .then((users) => {
-      //   return Promise.all(users.map((user) => {
-      //     const queryParams = new URLSearchParams({
-      //       q: user.username,
-      //     });
-
-      //     return polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`)
-      //       .then((resp) => resp.content)
-      //       .then((relationships) => {
-      //         // not enthused about another component requiring this property
-      //         // on each assignee...maybe come back and fix?
-      //         user.growth_relationships = relationships.filter((relationship) => true)
-      //       })
-      //       .then(() => user);
-      //   }))
-      // })
       .then((users) => {
         console.warn(users);
         this.setState({ users });
-
-        // preselecting all rows via table prop does not call the
-        // callback indicating as much. the setState call above MUST
-        // come first!
-        if (this.props.preSelected) {
-          this.handleRowSelect('all');
-        }
       })
   }
 
@@ -67,12 +45,13 @@ class CohortUsersList extends React.Component {
   // of users with no associated actions (aka read-only list)
   render() {
     console.warn('CohortUsersList render()');
+    console.warn('CohortUsersList render() selected: %o', this.state.selected.slice(0));
 
     const avatarColumnStyles = { width: '40px' };
-    const centerColumnStyles = { textAlign: 'center' };
+    // const centerColumnStyles = { textAlign: 'center' };
 
-    const userRows = this.state.users.map(user =>
-      <TableRow key={user.id}>
+    const userRows = this.state.users.map((user, ndx) =>
+      <TableRow key={user.id} selected={this.isSelected(ndx)}>
         <TableRowColumn style={avatarColumnStyles}><Avatar src={user.avatar_url} /></TableRowColumn>
         <TableRowColumn>{`${user.first_name} ${user.last_name}`}</TableRowColumn>
         <TableRowColumn>{user.username}</TableRowColumn>
@@ -84,12 +63,11 @@ class CohortUsersList extends React.Component {
     return (
       <Table
         onRowSelection={this.handleRowSelect}
-        multiSelectable={!!this.props.onSelect || this.props.preSelected}
-        allRowsSelected={this.props.preSelected}
+        multiSelectable={!!this.props.onSelect}
       >
         <TableHeader
           adjustForCheckbox={!!this.props.onSelect}
-          displaySelectAll={!!this.props.onSelect || this.props.preSelected}
+          displaySelectAll={!!this.props.onSelect}
         >
           <TableRow>
             <TableHeaderColumn style={avatarColumnStyles}></TableHeaderColumn>
@@ -98,16 +76,23 @@ class CohortUsersList extends React.Component {
             <TableHeaderColumn>Email</TableHeaderColumn>
           </TableRow>
         </TableHeader>
-        <TableBody displayRowCheckbox={!!this.props.onSelect || this.props.preSelected}>
+        <TableBody displayRowCheckbox={!!this.props.onSelect} deselectOnClickaway={false}>
           {userRows}
         </TableBody>
       </Table>
     );
   }
 
+  isSelected = (ndx) => {
+    return this.state.selected.indexOf(ndx) !== -1;
+  }
+
   handleRowSelect = (rowIndices) => {
     console.log('CohortUsersList handleRowSelect(%o)', rowIndices)
-    const users = (rowIndices === 'all') ? this.state.users : rowIndices.map(ndx => this.state.users[ndx]);
+    const users = (rowIndices === 'all') ? this.state.users : rowIndices.map((rowIndex) => this.state.users[rowIndex]);
+
+    this.setState({ selected: (rowIndices === 'all') ? Array(users.length).map((val, ndx) => ndx) : rowIndices }, () => console.log('CohortUsersList selected: %o', this.state.selected));
+
     if (this.props.onSelect) {
       this.props.onSelect(users);
     }

@@ -13,7 +13,8 @@ let promise;
 if (storedToken) {
   promise = Session.getCurrentUser()
     .catch(() => Session.authGuest())
-    .then(user => console.warn(user));
+    .then(user => console.warn(user))
+    .catch(() => console.error('Something went wrong when communicating with the server...'));
 } else {
   promise = Session.authGuest()
     .then(data => console.warn(data));

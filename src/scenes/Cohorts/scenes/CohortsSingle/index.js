@@ -1,9 +1,8 @@
 import React from 'react';
-// import {
-//   withRouter,
-// } from 'react-router-dom';
 
+import Drawer from 'material-ui/Drawer';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 
 import AssignGrowthAction from 'components/AssignGrowthAction';
 import CohortUsersList from '../../components/CohortUsersList';
@@ -17,6 +16,9 @@ export default class CohortsSingle extends React.Component {
     open: false,
 
     selectedUsers: [],
+
+    snackbarOpen: false,
+    snackbarMessage: 'You must select at least one user!',
   };
 
   componentDidMount() {
@@ -41,19 +43,38 @@ export default class CohortsSingle extends React.Component {
             <RaisedButton
               primary={true}
               label="Assign Growth Action"
-              onClick={() => {this.setState({ open: true })}}
+              onClick={this.handleAssignClick}
             />
           </div>
           <CohortUsersList
             cohortId={this.state.cohort.id}
-            preSelected={true}
             onSelect={this.handleCohortUsersSelect}
           />
-          <AssignGrowthAction
+          <Drawer
             open={this.state.open}
-            assignees={this.state.selectedUsers}
-            championId={this.state.cohort.champion_id}
-            onFinish={(growthActions) => { console.log('CohortsSingle onFinish(%o)', growthActions) }}
+            docked={false}
+            openSecondary={true}
+            onRequestChange={this.handleDrawerRequestChange}
+            width={500}
+          >
+            <AssignGrowthAction
+              assignees={this.state.selectedUsers}
+              championId={this.state.cohort.champion_id}
+              onFinish={(growthActions) => {
+                console.log('CohortsSingle onFinish(%o)', growthActions)
+                this.setState({
+                  open: false,
+                  selectedUsers: [],
+                });
+              }}
+            />
+          </Drawer>
+          <Snackbar
+            bodyStyle={{ backgroundColor: 'red' }}
+            open={this.state.snackbarOpen}
+            message={this.state.snackbarMessage}
+            autoHideDuration={10000}
+            onRequestClose={this.handleSnackbarClose}
           />
         </div>
       )
@@ -62,8 +83,30 @@ export default class CohortsSingle extends React.Component {
       );
   }
 
+  // make sure at least one user is selected before trying to assign
+  // any growth actions
+  handleAssignClick = () => {
+    if (this.state.selectedUsers.length) {
+      this.setState({ open: true })
+    } else {
+      this.setState({ snackbarOpen: true })
+    }
+  }
+
   handleCohortUsersSelect = (users) => {
-    console.log('handleCohortUsersSelect(%o)', users);
+    console.log('CohortsSingle handleCohortUsersSelect(%o)', users);
     this.setState({ selectedUsers: users });
+  }
+
+  // need this so that clicking away, pressing esc, etc. make sure the
+  // drawer remains closed until explicitly opened again
+  handleDrawerRequestChange = (open) => {
+    this.setState({ open });
+  }
+
+  handleSnackbarClose = () => {
+    this.setState({
+      snackbarOpen: false,
+    });
   }
 }

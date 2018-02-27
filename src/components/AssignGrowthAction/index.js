@@ -4,10 +4,10 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Avatar from 'material-ui/Avatar';
 import DatePicker from 'material-ui/DatePicker';
 import Divider from 'material-ui/Divider';
-import Drawer from 'material-ui/Drawer';
 import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 import {
   Step,
   Stepper,
@@ -29,14 +29,17 @@ import Session from 'services/session';
 
 class AssignGrowthAction extends React.Component {
   state = {
-    drawerOpen: false,
-    dataSource: [],
+    globalDueDate: null,
     toDoTitle: '',
     toDoTitleError: 'You must include a title!',
     toDoDescription: '',
-    globalDueDate: null,
+
+    dataSource: [],
     selectedContent: {},
     searchText: '',
+
+    snackbarOpen: false,
+    snackbarMessage: '',
 
     finished: false,
     stepIndex: 0,
@@ -54,18 +57,11 @@ class AssignGrowthAction extends React.Component {
   // growth_relationship[growee_id]  (required) Growth relationship growee
   componentWillReceiveProps(nextProps) {
     console.warn('AssignGrowthAction componentWillReceiveProps(%o)', nextProps);
-    const newState = {};
-
-    if (!this.state.drawerOpen && nextProps.open) {
-      newState.drawerOpen = true;
-    }
 
     Promise.all(nextProps.assignees.map((user, ndx) => {
       const queryParams = new URLSearchParams({
         q: user.username,
       });
-
-      let growthRelationship;
 
       return polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`)
         .then((resp) => resp.content)
@@ -78,7 +74,7 @@ class AssignGrowthAction extends React.Component {
             return matchingRelationships[0];
           } else {
             // api call to create relationship
-            console.log('creating new growthRelationship...')
+            console.log('AssignGrowthAction componentWillReceiveProps creating new growthRelationship...')
             return polymerApi.post(`growth_relationships`, {
               body: {
                 growth_relationship: {
@@ -98,7 +94,7 @@ class AssignGrowthAction extends React.Component {
         });
     }))
     .then((growthRelationships) => {
-      console.log('assignees/growthRelationships: %o/%o', this.props.assignees, growthRelationships);
+      console.log('AssignGrowthAction componentWillReceiveProps assignees/growthRelationships: %o/%o', this.props.assignees, growthRelationships);
       // add a placeholder for all of the growth action information that
       // can/will be configured. the schema matches what the api expects.
       growthRelationships.map((relationship) => {
@@ -111,9 +107,9 @@ class AssignGrowthAction extends React.Component {
         };
         return relationship;
       })
-      newState.growthRelationships = growthRelationships;
-    })
-    .then(() => this.setState(newState));
+
+      this.setState({ growthRelationships });
+    });
   }
 
   render() {
@@ -143,82 +139,73 @@ class AssignGrowthAction extends React.Component {
 
     return (
       <aside>
-        <Drawer
-          open={this.state.drawerOpen}
-          docked={false}
-          openSecondary={true}
-          onRequestChange={this.handleDrawerRequestChange}
-          width={500}
-        >
-          <header style={styles.header}>
-            <h1>Assign Growth Action</h1>
-            <p>Progress through the wizard to configure the growth action, or click away to cancel.</p>
-          </header>
+        <header style={styles.header}>
+          <h1>Assign Growth Action</h1>
+          <p>Progress through the wizard to configure the growth action, or click away to cancel.</p>
+        </header>
 
-          <Divider/>
+        <Divider/>
 
-          <section style={styles.body}>
-            <Stepper activeStep={stepIndex}>
-              <Step>
-                <StepLabel>Configure ToDo</StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>Select Content</StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>Edit Due Dates</StepLabel>
-              </Step>
-            </Stepper>
-
-            {finished ? (
-              <p>{this.getStepContent(-1)}</p>
-            ) : (
-              <div>{this.getStepContent(stepIndex)}</div>
-            )}
-          </section>
+        <section style={styles.body}>
+          <Stepper activeStep={stepIndex}>
+            <Step>
+              <StepLabel>Configure ToDo</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Select Content</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Edit Due Dates</StepLabel>
+            </Step>
+          </Stepper>
 
           {finished ? (
-            <footer style={styles.footer}>
-              <RaisedButton
-                style={styles.footerButtons}
-                primary={true}
-                label="Finish"
-                onClick={this.handleFinish}
-              />
-            </footer>
+            <p>{this.getStepContent(-1)}</p>
           ) : (
-            <footer style={styles.footer}>
-              <FlatButton
-                label="Back"
-                disabled={stepIndex === 0}
-                onClick={this.handlePrev}
-                style={styles.footerButtons}
-              />
-              <RaisedButton
-                label={stepIndex === 2 ? 'Finish' : 'Next'}
-                disabled={!this.state.canProceed}
-                primary={true}
-                onClick={this.handleNext}
-                style={styles.footerButtons}
-              />
-            </footer>
+            <div>{this.getStepContent(stepIndex)}</div>
           )}
-        </Drawer>
+        </section>
+
+        {finished ? (
+          <footer style={styles.footer}>
+            <RaisedButton
+              style={styles.footerButtons}
+              primary={true}
+              label="Finish"
+              onClick={this.handleFinish}
+            />
+          </footer>
+        ) : (
+          <footer style={styles.footer}>
+            <FlatButton
+              label="Back"
+              disabled={stepIndex === 0}
+              onClick={this.handlePrev}
+              style={styles.footerButtons}
+            />
+            <RaisedButton
+              label={stepIndex === 2 ? 'Finish' : 'Next'}
+              disabled={!this.state.canProceed}
+              primary={true}
+              onClick={this.handleNext}
+              style={styles.footerButtons}
+            />
+          </footer>
+        )}
+        <Snackbar
+          open={this.state.snackbarOpen}
+          message={this.state.snackbarMessage}
+          autoHideDuration={3000}
+          onRequestClose={this.handleSnackbarClose}
+        />
       </aside>
     );
   }
 
-  handleDrawerRequestChange = (drawerOpen) => {
-    console.log('handleDrawerRequestChange(%o)', drawerOpen);
-    this.setState({ drawerOpen });
-    if (!drawerOpen) {
-      this._resetState();
-    }
-  }
-
-  handleClose = () => {
+  handleSnackbarClose = () => {
     this.setState({
-      drawerOpen: false,
+      snackbarOpen: false,
+      snackbarMessage: '',
     });
   }
 
@@ -229,7 +216,7 @@ class AssignGrowthAction extends React.Component {
   // growth_action[linkable_type]  Optional type of content to be linked to (allowed values: Tree, Link)
   // growth_action[linkable_id]  Optional id of the linked content. Required if linkable_type is specified.
   handleFinish = () => {
-    console.log('handleFinish globalDueDate: %o', this.state.globalDueDate)
+    console.log('AssignGrowthAction handleFinish globalDueDate: %o', this.state.globalDueDate)
     // let cbPromise = Promise.resolve();
     // call api to create growth actions
     // try to save the api call for the very end as resetting it means resetting qa server
@@ -237,14 +224,27 @@ class AssignGrowthAction extends React.Component {
     let cbPromise = Promise.all(this.state.growthRelationships.map((relationship, ndx) => {
       // return polymerApi.post(`growth_relationships/${relationship.id}/growth_actions`, {
       const { growth_action } = relationship;
-      growth_action.title = this.state.toDoTitle;
-      growth_action.description = this.state.toDoDescription;
-      console.log(`POST growth_relationships/${relationship.id}/growth_actions  --  %o`, {
+      const endpoint = `growth_relationships/${relationship.id}/growth_actions`;
+      const apiParams = {
         body: {
           growth_action: growth_action,
         },
-      })
-    }));
+      };
+
+      growth_action.title = this.state.toDoTitle;
+      growth_action.description = this.state.toDoDescription;
+      console.log(`POST ${endpoint}  --  %o`, apiParams);
+
+      // make api call(s)
+      // return growth_action;
+      return polymerApi.post(endpoint, apiParams);
+    }))
+      .then(() => {
+        this.setState({
+          snackbarOpen: true,
+          snackbarMessage: `Growth action assigned to ${this.state.growthRelationships.length} users!`
+        })
+      });
 
 
     // call optionally provided callback
@@ -254,8 +254,8 @@ class AssignGrowthAction extends React.Component {
       );
     }
 
-    // then close (which resets data)
-    cbPromise.then(() => this.handleClose());
+    // then reset data
+    cbPromise.then(() => this._resetState());
   }
 
   handleNext = () => {
@@ -316,8 +316,7 @@ class AssignGrowthAction extends React.Component {
           </div>
         );
       case 2:
-        const avatarColumnStyles = { width: '40px' };
-        const centerColumnStyles = { textAlign: 'center' };
+        const avatarColumnStyles = { width: '40px', padding: '0 5px' };
 
         const assigneeRows = this.props.assignees.map((user, ndx) =>
           <TableRow key={user.id} displayBorder={false}>
@@ -362,7 +361,7 @@ class AssignGrowthAction extends React.Component {
 
   handleNewActionDueDate = (ndx, newDate) => {
     this._updateGrowthActions(ndx, { due_at: newDate });
-    console.log('handleNewActionDueDate() updated growthRelationships: %o', this.state.growthRelationships);
+    console.log('AssignGrowthAction handleNewActionDueDate() updated growthRelationships: %o', this.state.growthRelationships);
   }
 
   handleTitleChange = (event) => {
@@ -405,17 +404,20 @@ class AssignGrowthAction extends React.Component {
   _resetState = () => {
     this.setState({
       dataSource: [],
-      selected: {},
+      searchText: '',
+      selectedContent: {},
       toDoTitle: '',
       toDoDescription: '',
+      globalDueDate: null,
 
       finished: false,
       stepIndex: 0,
+      canProceed: false,
     });
   }
 
   _selectResult = (result) => {
-    console.log('selectedContent: %o',result);
+    console.log('AssignGrowthAction selectedContent: %o',result);
     this._updateGrowthActions(null, {
       linkable_type: result.class_name,
       linkable_id: result.id,
@@ -475,6 +477,7 @@ class AssignGrowthAction extends React.Component {
         isValid = isValid && !!selectedContent.id;
       case (stepIndex >= 0):
         isValid = isValid && !!toDoTitle.length;
+      default:
     }
     this.setState({ canProceed: isValid });
     // console.log('_toDoConfigIsValid() returning %o', isValid);
