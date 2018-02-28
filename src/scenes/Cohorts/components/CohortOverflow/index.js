@@ -10,7 +10,7 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
-import CohortUsersList from './CohortUsersList';
+import CohortUsersList from '../CohortUsersList';
 
 
 class CohortOverflow extends React.Component {

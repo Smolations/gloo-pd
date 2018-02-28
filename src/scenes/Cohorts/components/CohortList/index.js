@@ -9,7 +9,7 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 
-import CohortOverflow from './CohortOverflow';
+import CohortOverflow from '../CohortOverflow';
 
 import polymerApi from 'services/polymer-api';
 

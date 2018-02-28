@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import AutoComplete from 'material-ui/AutoComplete';
 import Avatar from 'material-ui/Avatar';
@@ -55,10 +56,10 @@ class AssignGrowthAction extends React.Component {
   // growth_relationship[owner_id]  (required)  ID of owner
   // growth_relationship[agent_id]  (required)  Growth relationship agent
   // growth_relationship[growee_id]  (required) Growth relationship growee
-  componentWillReceiveProps(nextProps) {
-    console.warn('AssignGrowthAction componentWillReceiveProps(%o)', nextProps);
+  componentWillMount() {
+    console.warn('AssignGrowthAction componentWillMount(%o)', this.props);
 
-    Promise.all(nextProps.assignees.map((user, ndx) => {
+    Promise.all(this.props.assignees.map((user, ndx) => {
       const queryParams = new URLSearchParams({
         q: user.username,
       });
@@ -74,12 +75,12 @@ class AssignGrowthAction extends React.Component {
             return matchingRelationships[0];
           } else {
             // api call to create relationship
-            console.log('AssignGrowthAction componentWillReceiveProps creating new growthRelationship...')
+            console.log('AssignGrowthAction componentWillMount creating new growthRelationship...')
             return polymerApi.post(`growth_relationships`, {
               body: {
                 growth_relationship: {
                   owner_type: 'Champion',
-                  owner_id: nextProps.championId,
+                  owner_id: this.props.championId,
                   agent_id: Session.session.user_id,
                   growee_id: user.id,
                 }
@@ -94,7 +95,7 @@ class AssignGrowthAction extends React.Component {
         });
     }))
     .then((growthRelationships) => {
-      console.log('AssignGrowthAction componentWillReceiveProps assignees/growthRelationships: %o/%o', this.props.assignees, growthRelationships);
+      console.log('AssignGrowthAction componentWillMount assignees/growthRelationships: %o/%o', this.props.assignees, growthRelationships);
       // add a placeholder for all of the growth action information that
       // can/will be configured. the schema matches what the api expects.
       growthRelationships.map((relationship) => {
@@ -485,5 +486,8 @@ class AssignGrowthAction extends React.Component {
   }
 }
 
+AssignGrowthAction.propTypes = {
+  championId: PropTypes.number,
+};
 
 export default AssignGrowthAction;
