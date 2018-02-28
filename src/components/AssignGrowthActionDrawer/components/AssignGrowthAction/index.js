@@ -39,14 +39,11 @@ class AssignGrowthAction extends React.Component {
     selectedContent: {},
     searchText: '',
 
-    snackbarOpen: false,
-    snackbarMessage: '',
-
     finished: false,
     stepIndex: 0,
     canProceed: false,
 
-    growthRelationships: [],
+    growthActions: [],
   }
 
   // champion id from this.props.championId
@@ -59,58 +56,20 @@ class AssignGrowthAction extends React.Component {
   componentWillMount() {
     console.warn('AssignGrowthAction componentWillMount(%o)', this.props);
 
-    Promise.all(this.props.assignees.map((user, ndx) => {
-      const queryParams = new URLSearchParams({
-        q: user.username,
-      });
+    console.log('AssignGrowthAction componentWillMount assignees/growthRelationships: %o/%o', this.props.assignees, this.props.growthRelationships);
+    // add a placeholder for all of the growth action information that
+    // can/will be configured. the schema matches what the api expects.
+    const growthActions = this.props.growthRelationships.map((relationship) => {
+      return {
+        title: null,
+        description: null,
+        due_at: null,
+        linkable_type: null,
+        linkable_id: null,
+      };
+    })
 
-      return polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`)
-        .then((resp) => resp.content)
-        .then((relationships) => {
-          const matchingRelationships = relationships.filter((relationship) =>
-            relationship.growee_id === Number(user.id)
-          );
-
-          if (matchingRelationships.length) {
-            return matchingRelationships[0];
-          } else {
-            // api call to create relationship
-            console.log('AssignGrowthAction componentWillMount creating new growthRelationship...')
-            return polymerApi.post(`growth_relationships`, {
-              body: {
-                growth_relationship: {
-                  owner_type: 'Champion',
-                  owner_id: this.props.championId,
-                  agent_id: Session.session.user_id,
-                  growee_id: user.id,
-                }
-              }
-            })
-            .catch((resp) => {
-              console.error(resp);
-              throw new Error('Unable to create new growth relationship!')
-            })
-            .then((resp) => resp.content);
-          }
-        });
-    }))
-    .then((growthRelationships) => {
-      console.log('AssignGrowthAction componentWillMount assignees/growthRelationships: %o/%o', this.props.assignees, growthRelationships);
-      // add a placeholder for all of the growth action information that
-      // can/will be configured. the schema matches what the api expects.
-      growthRelationships.map((relationship) => {
-        relationship.growth_action = {
-          title: null,
-          description: null,
-          due_at: null,
-          linkable_type: null,
-          linkable_id: null,
-        };
-        return relationship;
-      })
-
-      this.setState({ growthRelationships });
-    });
+    this.setState({ growthActions });
   }
 
   render() {
@@ -193,21 +152,8 @@ class AssignGrowthAction extends React.Component {
             />
           </footer>
         )}
-        <Snackbar
-          open={this.state.snackbarOpen}
-          message={this.state.snackbarMessage}
-          autoHideDuration={3000}
-          onRequestClose={this.handleSnackbarClose}
-        />
       </aside>
     );
-  }
-
-  handleSnackbarClose = () => {
-    this.setState({
-      snackbarOpen: false,
-      snackbarMessage: '',
-    });
   }
 
   // POST /api/growth_relationships/:growth_relationship_id/growth_actions
@@ -222,41 +168,33 @@ class AssignGrowthAction extends React.Component {
     // call api to create growth actions
     // try to save the api call for the very end as resetting it means resetting qa server
     // wait, the outer component should make the call after receiving data via callback, right?
-    let cbPromise = Promise.all(this.state.growthRelationships.map((relationship, ndx) => {
+    let cbPromise = Promise.all(this.props.growthRelationships.map((relationship, ndx) => {
       // return polymerApi.post(`growth_relationships/${relationship.id}/growth_actions`, {
-      const { growth_action } = relationship;
+      const growthAction = this.state.growthActions[ndx];
       const endpoint = `growth_relationships/${relationship.id}/growth_actions`;
       const apiParams = {
         body: {
-          growth_action: growth_action,
+          growth_action: growthAction,
         },
       };
 
-      growth_action.title = this.state.toDoTitle;
-      growth_action.description = this.state.toDoDescription;
+      growthAction.title = this.state.toDoTitle;
+      growthAction.description = this.state.toDoDescription;
       console.log(`POST ${endpoint}  --  %o`, apiParams);
 
       // make api call(s)
       // return growth_action;
-      return polymerApi.post(endpoint, apiParams);
+      // return polymerApi.post(endpoint, apiParams);
     }))
       .then(() => {
-        this.setState({
-          snackbarOpen: true,
-          snackbarMessage: `Growth action assigned to ${this.state.growthRelationships.length} users!`
-        })
+        // call optionally provided callback
+        if (this.props.onFinish) {
+          this.props.onFinish(this.state.growthActions.slice(0));
+        }
       });
 
-
-    // call optionally provided callback
-    if (this.props.onFinish) {
-      cbPromise = cbPromise.then(() =>
-        this.props.onFinish(this.state.growthRelationships.slice(0))
-      );
-    }
-
     // then reset data
-    cbPromise.then(() => this._resetState());
+    // cbPromise.then(() => this._resetState());
   }
 
   handleNext = () => {
@@ -330,7 +268,7 @@ class AssignGrowthAction extends React.Component {
                 minDate={new Date()}
                 hintText="Due Date (optional)"
                 onChange={(nil, newDate) => this.handleNewActionDueDate(ndx, newDate)}
-                value={this.state.growthRelationships[ndx].growth_action.due_at}
+                value={this.state.growthActions[ndx].due_at}
               />
             </TableRowColumn>
           </TableRow>
@@ -402,23 +340,23 @@ class AssignGrowthAction extends React.Component {
     }
   }
 
-  _resetState = () => {
-    this.setState({
-      dataSource: [],
-      searchText: '',
-      selectedContent: {},
-      toDoTitle: '',
-      toDoDescription: '',
-      globalDueDate: null,
+  // _resetState = () => {
+  //   this.setState({
+  //     dataSource: [],
+  //     searchText: '',
+  //     selectedContent: {},
+  //     toDoTitle: '',
+  //     toDoDescription: '',
+  //     globalDueDate: null,
 
-      finished: false,
-      stepIndex: 0,
-      canProceed: false,
-    });
-  }
+  //     finished: false,
+  //     stepIndex: 0,
+  //     canProceed: false,
+  //   });
+  // }
 
   _selectResult = (result) => {
-    console.log('AssignGrowthAction selectedContent: %o',result);
+    console.log('AssignGrowthAction _selectResult(%o)', result);
     this._updateGrowthActions(null, {
       linkable_type: result.class_name,
       linkable_id: result.id,
@@ -437,21 +375,22 @@ class AssignGrowthAction extends React.Component {
    *  @param {object} actionProps The new growth action properties to apply.
    */
   _updateGrowthActions = (ndx, actionProps) => {
+    console.log('AssignGrowthAction _updateGrowthActions(%o, %o)', ndx, actionProps);
     // replacing array reference here, but the object references will
     // stay the same. so i think `this.state.growthRelationships[0].foo = true`
     // would persist, but seems like an anti-pattern, no?
-    const growthRelationships = this.state.growthRelationships.slice(0);
-    const updateAction = (relationship, action) => {
-      relationship.growth_action = Object.assign({}, relationship.growth_action, action);
-      return relationship;
+    let growthActions = this.state.growthActions.slice(0);
+    const updateAction = (originalAction, newAction) => {
+      return Object.assign({}, originalAction, newAction);
     };
 
-    if (growthRelationships[ndx]) {
-      growthRelationships[ndx] = updateAction(growthRelationships[ndx], actionProps);
+    if (growthActions[ndx]) {
+      growthActions[ndx] = updateAction(growthActions[ndx], actionProps);
     } else {
-      growthRelationships.forEach((relationship) => updateAction(relationship, actionProps));
+      growthActions = growthActions.map((growthAction) => updateAction(growthAction, actionProps));
     }
-    this.setState({ growthRelationships });
+    console.log('AssignGrowthAction _updateGrowthActions() setting state: %o', { growthActions });
+    this.setState({ growthActions });
   }
 
   _transformResults = (results) => {

@@ -11,19 +11,8 @@ export default class CohortsSingleAssignActions extends React.Component {
   state = {
     open: false,
     selectedUsers: [],
+    selectedGrowthRelationships: [],
   };
-
-  componentDidMount() {
-    console.warn('CohortsSingleAssignActions componentDidMount');
-    // const { match } = this.props;
-    // const cohortId = match.params.cohortId;
-
-    // polymerApi.get(`cohorts/${cohortId}`)
-    //   .then((resp) => {
-    //     console.log('CohortsSingle cohort: %o', resp);
-    //     this.setState({ cohort: resp.content });
-    //   });
-  }
 
   render() {
     console.warn('CohortsSingleAssignActions render()');
@@ -72,13 +61,13 @@ export default class CohortsSingleAssignActions extends React.Component {
           <AssignGrowthActionDrawer
             open={this.state.open}
             assignees={this.state.selectedUsers}
+            growthRelationships={this.state.selectedGrowthRelationships}
             championId={this.props.cohort.champion_id}
             onRequestChange={this.handleDrawerRequestChange}
             onFinish={(growthActions) => {
-              console.log('CohortsSingleAssignActions onFinish(%o)', growthActions)
+              console.log('CohortsSingleAssignActions AssignGrowthActionDrawer.onFinish(%o)', growthActions)
               this.setState({
                 open: false,
-                selectedUsers: [],
               });
             }}
           />
@@ -99,9 +88,14 @@ export default class CohortsSingleAssignActions extends React.Component {
     }
   }
 
-  handleCohortUsersSelect = (users) => {
-    console.log('CohortsSingleAssignActions handleCohortUsersSelect(%o)', users);
-    this.setState({ selectedUsers: users });
+  handleCohortUsersSelect = (selectedUsers) => {
+    console.log('CohortsSingleAssignActions handleCohortUsersSelect(%o)', selectedUsers);
+    const selectedGrowthRelationships = selectedUsers.map((user) => {
+      return this.props.growthRelationships.filter((relationship) => relationship.growee_id === user.id).pop();
+    });
+
+    console.log('CohortsSingleAssignActions handleCohortUsersSelect() setting state: %o', { selectedUsers, selectedGrowthRelationships });
+    this.setState({ selectedUsers, selectedGrowthRelationships });
   }
 
   // need this so that clicking away, pressing esc, etc. make sure the

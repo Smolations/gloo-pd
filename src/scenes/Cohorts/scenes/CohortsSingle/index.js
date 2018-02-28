@@ -9,6 +9,7 @@ import CohortsSingleView from './scenes/CohortsSingleView';
 import CohortsSingleAssignActions from './scenes/CohortsSingleAssignActions';
 import CohortsSingleViewActions from './scenes/CohortsSingleViewActions';
 
+import Session from 'services/session';
 import polymerApi from 'services/polymer-api';
 
 
@@ -16,6 +17,7 @@ export default class CohortsSingle extends React.Component {
   state = {
     cohort: null,
     cohortUsers: [],
+    growthRelationships: [],
     tabValue: 'a',
   };
 
@@ -27,9 +29,78 @@ export default class CohortsSingle extends React.Component {
     const cohortResp = await polymerApi.get(`cohorts/${cohortId}`);
     const cohortUsersResp = await polymerApi.get(`cohorts/${cohortId}/users`);
 
+    const growthRelationships = await Promise.all(cohortUsersResp.content.map(async (user, ndx) => {
+      const queryParams = new URLSearchParams({
+        q: user.username,
+      });
+
+      const growthRelationshipsResp = await polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`);
+      const relationships = growthRelationshipsResp.content;
+      const matchingRelationships = relationships.filter((relationship) =>
+        relationship.growee_id === Number(user.id)
+      );
+
+      if (matchingRelationships.length) {
+        // should only have one element at most after filtering
+        return matchingRelationships[0];
+      } else {
+        // api call to create relationship
+        console.log('CohortsSingle componentDidMount creating new growthRelationship...')
+        const createRelationshipResp = await polymerApi.post(`growth_relationships`, {
+          body: {
+            growth_relationship: {
+              owner_type: 'Champion',
+              owner_id: this.props.championId,
+              agent_id: Session.session.user_id,
+              growee_id: user.id,
+            }
+          }
+        });
+
+        return createRelationshipResp.content;
+      }
+
+      return polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`)
+        .then((resp) => resp.content)
+        .then((relationships) => {
+          const matchingRelationships = relationships.filter((relationship) =>
+            relationship.growee_id === Number(user.id)
+          );
+
+          if (matchingRelationships.length) {
+            return matchingRelationships[0];
+          } else {
+            // api call to create relationship
+            console.log('AssignGrowthAction componentWillMount creating new growthRelationship...')
+            return polymerApi.post(`growth_relationships`, {
+              body: {
+                growth_relationship: {
+                  owner_type: 'Champion',
+                  owner_id: this.props.championId,
+                  agent_id: Session.session.user_id,
+                  growee_id: user.id,
+                }
+              }
+            })
+            .catch((resp) => {
+              console.error(resp);
+              throw new Error('Unable to create new growth relationship!')
+            })
+            .then((resp) => resp.content);
+          }
+        });
+    }));
+
+    console.log('CohortsSingle componentDidMount setting state: %o', {
+      cohort: cohortResp.content,
+      cohortUsers: cohortUsersResp.content,
+      growthRelationships: growthRelationships,
+    });
+
     this.setState({
       cohort: cohortResp.content,
       cohortUsers: cohortUsersResp.content,
+      growthRelationships: growthRelationships,
     });
   }
 
@@ -47,10 +118,17 @@ export default class CohortsSingle extends React.Component {
               <CohortsSingleView cohortUsers={this.state.cohortUsers} />
             </Tab>
             <Tab label="Assign Growth Action" value="b">
-              <CohortsSingleAssignActions cohort={this.state.cohort} cohortUsers={this.state.cohortUsers} />
+              <CohortsSingleAssignActions
+                cohort={this.state.cohort}
+                cohortUsers={this.state.cohortUsers}
+                growthRelationships={this.state.growthRelationships}
+              />
             </Tab>
             <Tab label="View Growth Actions" value="c">
-              <CohortsSingleViewActions cohortUsers={this.state.cohortUsers} />
+              <CohortsSingleViewActions
+                cohortUsers={this.state.cohortUsers}
+                growthRelationships={this.state.growthRelationships}
+              />
             </Tab>
           </Tabs>
         </div>
