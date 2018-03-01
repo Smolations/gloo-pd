@@ -69,6 +69,10 @@ export default class CohortsSingleAssignActions extends React.Component {
               this.setState({
                 open: false,
               });
+
+              if (this.props.onAssignment) {
+                this.props.onAssignment();
+              }
             }}
           />
         </div>

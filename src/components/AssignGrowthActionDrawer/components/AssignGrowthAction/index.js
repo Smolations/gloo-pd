@@ -183,8 +183,7 @@ class AssignGrowthAction extends React.Component {
       console.log(`POST ${endpoint}  --  %o`, apiParams);
 
       // make api call(s)
-      // return growth_action;
-      // return polymerApi.post(endpoint, apiParams);
+      return polymerApi.post(endpoint, apiParams);
     }))
       .then(() => {
         // call optionally provided callback

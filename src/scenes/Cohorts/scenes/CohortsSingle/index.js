@@ -19,6 +19,7 @@ export default class CohortsSingle extends React.Component {
     cohortUsers: [],
     growthRelationships: [],
     tabValue: 'a',
+    shouldRefreshViewActions: false,
   };
 
   async componentDidMount() {
@@ -122,12 +123,15 @@ export default class CohortsSingle extends React.Component {
                 cohort={this.state.cohort}
                 cohortUsers={this.state.cohortUsers}
                 growthRelationships={this.state.growthRelationships}
+                onAssignment={() => this.setState({ shouldRefreshViewActions: true })}
               />
             </Tab>
             <Tab label="View Growth Actions" value="c">
               <CohortsSingleViewActions
                 cohortUsers={this.state.cohortUsers}
                 growthRelationships={this.state.growthRelationships}
+                shouldRefresh={this.state.shouldRefreshViewActions}
+                onRefresh={() => this.setState({ shouldRefreshViewActions: false })}
               />
             </Tab>
           </Tabs>
