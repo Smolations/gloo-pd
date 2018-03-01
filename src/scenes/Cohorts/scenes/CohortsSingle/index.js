@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 
 import {
   Tab,
@@ -13,7 +15,7 @@ import Session from 'services/session';
 import polymerApi from 'services/polymer-api';
 
 
-export default class CohortsSingle extends React.Component {
+class CohortsSingle extends React.Component {
   state = {
     cohort: null,
     cohortUsers: [],
@@ -24,11 +26,15 @@ export default class CohortsSingle extends React.Component {
 
   async componentDidMount() {
     console.warn('CohortsSingle componentDidMount');
-    const { match } = this.props;
+    const { history, match } = this.props;
     const cohortId = match.params.cohortId;
 
     const cohortResp = await polymerApi.get(`cohorts/${cohortId}`);
     const cohortUsersResp = await polymerApi.get(`cohorts/${cohortId}/users`);
+
+    if (cohortResp.content.champion_id !== this.props.championId) {
+      return history.push('/cohorts');
+    }
 
     const growthRelationships = await Promise.all(cohortUsersResp.content.map(async (user, ndx) => {
       const queryParams = new URLSearchParams({
@@ -60,36 +66,6 @@ export default class CohortsSingle extends React.Component {
 
         return createRelationshipResp.content;
       }
-
-      return polymerApi.get(`my/growth_relationships/as_agent?${queryParams}`)
-        .then((resp) => resp.content)
-        .then((relationships) => {
-          const matchingRelationships = relationships.filter((relationship) =>
-            relationship.growee_id === Number(user.id)
-          );
-
-          if (matchingRelationships.length) {
-            return matchingRelationships[0];
-          } else {
-            // api call to create relationship
-            console.log('AssignGrowthAction componentWillMount creating new growthRelationship...')
-            return polymerApi.post(`growth_relationships`, {
-              body: {
-                growth_relationship: {
-                  owner_type: 'Champion',
-                  owner_id: this.props.championId,
-                  agent_id: Session.session.user_id,
-                  growee_id: user.id,
-                }
-              }
-            })
-            .catch((resp) => {
-              console.error(resp);
-              throw new Error('Unable to create new growth relationship!')
-            })
-            .then((resp) => resp.content);
-          }
-        });
     }));
 
     console.log('CohortsSingle componentDidMount setting state: %o', {
@@ -103,6 +79,13 @@ export default class CohortsSingle extends React.Component {
       cohortUsers: cohortUsersResp.content,
       growthRelationships: growthRelationships,
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { history } = this.props;
+    if (this.props.championId !== nextProps.championId) {
+      history.push('/cohorts');
+    }
   }
 
   render() {
@@ -146,3 +129,9 @@ export default class CohortsSingle extends React.Component {
     this.setState({ tabValue });
   }
 }
+
+CohortsSingle.propTypes = {
+  championId: PropTypes.number.isRequired,
+};
+
+export default withRouter(CohortsSingle);

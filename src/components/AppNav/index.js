@@ -7,25 +7,19 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 
 import NavLoginButton from './components/NavLoginButton';
-import NavLogoutButton from './components/NavLogoutButton';
+import NavMenu from './components/NavMenu';
 
 import Session from 'services/session';
 
 
-class AppNavRouterless extends React.Component {
-  state = { drawerOpen: false };
-
-  handleToggle = () => this.setState({ drawerOpen: !this.state.drawerOpen });
-
-  handleClose = (route) => {
-    const { history } = this.props;
-    this.setState({ drawerOpen: false });
-    history.push(route);
+class AppNav extends React.Component {
+  state = {
+    drawerOpen: false,
   };
 
   render() {
     const headerStyles = {
-      // padding: '16px',
+      padding: '0 16px',
     };
 
     return (
@@ -33,7 +27,7 @@ class AppNavRouterless extends React.Component {
         <Drawer
           open={this.state.drawerOpen}
           docked={false}
-          onRequestChange={(drawerOpen) => this.setState({drawerOpen})}
+          onRequestChange={(drawerOpen) => this.setState({ drawerOpen })}
         >
           <h1 style={headerStyles}>Dam Jena</h1>
           <h2 style={headerStyles}>v1.0.0</h2>
@@ -43,14 +37,26 @@ class AppNavRouterless extends React.Component {
         </Drawer>
         <AppBar
           title="Dam Jena - Harnessing Growth Energy"
-          iconElementRight={Session.session.isGuest === false ? <NavLogoutButton/> : <NavLoginButton/>}
+          iconElementRight={Session.session.isGuest === false ? <NavMenu onChampionSelect={this.handleChampionSelect} /> : <NavLoginButton/>}
           onLeftIconButtonClick={this.handleToggle}
         />
       </header>
     );
   }
+
+  handleToggle = () => this.setState({ drawerOpen: !this.state.drawerOpen });
+
+  handleClose = (route) => {
+    const { history } = this.props;
+    this.setState({ drawerOpen: false });
+    history.push(route);
+  };
+
+  handleChampionSelect = (champ) => {
+    if (this.props.onChampionSelect) {
+      this.props.onChampionSelect(champ);
+    }
+  }
 }
 
-const AppNav = withRouter(AppNavRouterless);
-
-export default AppNav;
+export default withRouter(AppNav);

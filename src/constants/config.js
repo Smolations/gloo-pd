@@ -1,7 +1,7 @@
 // import userConfig from '../config.user.js';
 
 let CONFIG = {
-  server: 'https://polymer-qa8.dev.gloo.us',
+  server: 'https://polymer-staging.dev.gloo.us',
 };
 
 // try {

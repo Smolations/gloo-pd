@@ -1,3 +1,4 @@
+/* eslint no-fallthrough:"off" */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -8,7 +9,6 @@ import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import Snackbar from 'material-ui/Snackbar';
 import {
   Step,
   Stepper,
@@ -25,7 +25,6 @@ import {
 import TextField from 'material-ui/TextField';
 
 import polymerApi from 'services/polymer-api';
-import Session from 'services/session';
 
 
 class AssignGrowthAction extends React.Component {
@@ -46,13 +45,6 @@ class AssignGrowthAction extends React.Component {
     growthActions: [],
   }
 
-  // champion id from this.props.championId
-
-  // POST /api/growth_relationships
-  // growth_relationship[owner_type]  (required)  Type of owner (allowed values: User, Champion)
-  // growth_relationship[owner_id]  (required)  ID of owner
-  // growth_relationship[agent_id]  (required)  Growth relationship agent
-  // growth_relationship[growee_id]  (required) Growth relationship growee
   componentWillMount() {
     console.warn('AssignGrowthAction componentWillMount(%o)', this.props);
 
@@ -156,20 +148,12 @@ class AssignGrowthAction extends React.Component {
     );
   }
 
-  // POST /api/growth_relationships/:growth_relationship_id/growth_actions
-  // growth_action[title]  (required) Growth action title
-  // growth_action[description]  (required) Growth action description
-  // growth_action[due_at]  Growth action due at
-  // growth_action[linkable_type]  Optional type of content to be linked to (allowed values: Tree, Link)
-  // growth_action[linkable_id]  Optional id of the linked content. Required if linkable_type is specified.
   handleFinish = () => {
     console.log('AssignGrowthAction handleFinish globalDueDate: %o', this.state.globalDueDate)
-    // let cbPromise = Promise.resolve();
     // call api to create growth actions
     // try to save the api call for the very end as resetting it means resetting qa server
     // wait, the outer component should make the call after receiving data via callback, right?
-    let cbPromise = Promise.all(this.props.growthRelationships.map((relationship, ndx) => {
-      // return polymerApi.post(`growth_relationships/${relationship.id}/growth_actions`, {
+    Promise.all(this.props.growthRelationships.map((relationship, ndx) => {
       const growthAction = this.state.growthActions[ndx];
       const endpoint = `growth_relationships/${relationship.id}/growth_actions`;
       const apiParams = {
@@ -191,9 +175,6 @@ class AssignGrowthAction extends React.Component {
           this.props.onFinish(this.state.growthActions.slice(0));
         }
       });
-
-    // then reset data
-    // cbPromise.then(() => this._resetState());
   }
 
   handleNext = () => {
@@ -338,21 +319,6 @@ class AssignGrowthAction extends React.Component {
         });
     }
   }
-
-  // _resetState = () => {
-  //   this.setState({
-  //     dataSource: [],
-  //     searchText: '',
-  //     selectedContent: {},
-  //     toDoTitle: '',
-  //     toDoDescription: '',
-  //     globalDueDate: null,
-
-  //     finished: false,
-  //     stepIndex: 0,
-  //     canProceed: false,
-  //   });
-  // }
 
   _selectResult = (result) => {
     console.log('AssignGrowthAction _selectResult(%o)', result);

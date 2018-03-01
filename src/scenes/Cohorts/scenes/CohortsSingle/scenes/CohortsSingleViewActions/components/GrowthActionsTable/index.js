@@ -1,23 +1,15 @@
 import React from 'react';
 
-import Avatar from 'material-ui/Avatar';
 import {
   Card,
-  CardActions,
   CardHeader,
   CardMedia,
   CardTitle,
   CardText,
 } from 'material-ui/Card';
 import {
-  GridList,
-  GridTile,
-} from 'material-ui/GridList';
-import {
   Table,
   TableBody,
-  TableHeader,
-  TableHeaderColumn,
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
@@ -81,6 +73,7 @@ class GrowthActionsTable extends React.Component {
 
       if (this.state.userActionsMap[user.id]) {
         actionCards = this.state.userActionsMap[user.id].map((action) => {
+          console.log('action: %o', action)
           let dueAt = 'No Due Date';
           let dueAtDate;
 
@@ -92,9 +85,9 @@ class GrowthActionsTable extends React.Component {
           return (
             <Card key={action.id} style={styles.actionCard}>
               <CardMedia
-                overlay={<CardTitle title="Content title" subtitle={this._getLinkableType(action.linkable_type)} />}
+                overlay={<CardTitle title={action.linkable.title} subtitle={this._getLinkableType(action.linkable_type)} />}
               >
-                <img src="http://www.material-ui.com/images/grid-list/00-52-29-429_640.jpg" alt="" />
+                <img src={action.linkable.banner.src} alt="" />
               </CardMedia>
               <CardTitle title={action.title} subtitle={dueAt} />
               <CardText>
@@ -114,6 +107,11 @@ class GrowthActionsTable extends React.Component {
                 subtitle={`@${user.username}`}
                 avatar={user.avatar_url || 'https://thesocietypages.org/socimages/files/2009/05/nopic_192.gif'}
               />
+              <CardMedia
+                overlay={<CardTitle title={' '} subtitle={' '} />}
+              >
+                <img src={user.banner_url || `https://source.unsplash.com/random/${parseInt(styles.userCard.width)}x${parseInt(styles.userCard.width)/3.27}?foo=${user.id}`} alt="" />
+              </CardMedia>
             </Card>
           </TableRowColumn>
           <TableRowColumn style={styles.actionCardsColumn}>
@@ -180,6 +178,25 @@ class GrowthActionsTable extends React.Component {
         .then((actions) => {
           const user = this.props.users[ndx];
           // console.log('setting actions map for user:  %o => %o',user, actions);
+          actions.forEach((action) => {
+            action.linkable = { banner: {} };
+            switch (action.linkable_type) {
+              case 'Collection':
+                polymerApi.get(`collections/${action.linkable_id}`)
+                  .then((resp) => {
+                    action.linkable = resp.content;
+                  });
+                break;
+              case 'Tree':
+                polymerApi.get(`trees/${action.linkable_id}`)
+                  .then((resp) => {
+                    action.linkable = resp.content;
+                  });
+                break;
+              default:
+            }
+
+          })
           userActionsMap[user.id] = actions;
         });
     }))

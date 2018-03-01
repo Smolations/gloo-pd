@@ -19,7 +19,12 @@ class CohortList extends React.Component {
     cohorts: [],
   }
 
+  componentDidMount() {
+    this._loadCohorts(this.props.championId)
+  }
+
   componentWillReceiveProps(nextProps) {
+    console.warn('CohortList componentWillReceiveProps(%o)', nextProps);
     if (this.props.championId !== nextProps.championId) {
       this._loadCohorts(nextProps.championId);
     }
