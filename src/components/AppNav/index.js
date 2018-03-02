@@ -31,9 +31,9 @@ class AppNav extends React.Component {
         </Menu.Item>
       );
 
-
+    // fixed="top"
     return (
-      <Menu fixed="top" inverted>
+      <Menu inverted>
         <Container>
           <Menu.Item header as="h2">Dam Jena</Menu.Item>
           <Menu.Item
