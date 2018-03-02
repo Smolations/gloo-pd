@@ -110,7 +110,7 @@ class GrowthActionsTable extends React.Component {
               <CardMedia
                 overlay={<CardTitle title={' '} subtitle={' '} />}
               >
-                <img src={user.banner_url || `https://source.unsplash.com/random/${parseInt(styles.userCard.width)}x${parseInt(styles.userCard.width)/3.27}?foo=${user.id}`} alt="" />
+                <img src={user.banner_url || `https://source.unsplash.com/random/${parseInt(styles.userCard.width,10)}x${parseInt(styles.userCard.width,10)/3.27}?foo=${user.id}`} alt="" />
               </CardMedia>
             </Card>
           </TableRowColumn>
@@ -164,7 +164,7 @@ class GrowthActionsTable extends React.Component {
       Tree: 'Program',
       Collection: 'Collection',
     };
-    return classMap[className];
+    return classMap[className] || className;
   }
 
   _refreshGrowthActions = () => {

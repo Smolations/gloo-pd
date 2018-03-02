@@ -7,9 +7,9 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import AppNav from 'components/AppNav';
 
-import Cohorts from 'scenes/Cohorts';
-import Home from 'scenes/Home';
-import Login from 'scenes/Login';
+import Cohorts from './scenes/Cohorts';
+import Home from './scenes/Home';
+import Login from './scenes/Login';
 import PrivateRoute from 'components/PrivateRoute';
 
 

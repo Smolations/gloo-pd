@@ -1,0 +1,19 @@
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "modules": false,
+      "targets": {
+        // browserlist combined by OR clause
+        // https://github.com/ai/browserslist
+        "browsers": ["last 2 versions", "not ie <= 10"],
+      },
+      "useBuiltIns": "usage",
+      "debug": false,
+    }],
+    "@babel/react"
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-object-rest-spread"
+  ]
+}
