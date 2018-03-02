@@ -1,13 +1,16 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import FlatButton from 'material-ui/FlatButton';
+
+import {
+  Button,
+} from 'semantic-ui-react';
 
 
 const NavLoginButton = withRouter(
   ({ history }) => {
     // console.warn('NavLoginButton render()');
     return (
-      <FlatButton style={{ color: 'white' }} label="Sign In" onClick={() => history.push("/login")} />
+      <Button secondary={true} onClick={() => history.push("/login")}>Sign In</Button>
     );
   }
 );
