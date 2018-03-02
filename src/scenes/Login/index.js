@@ -2,9 +2,12 @@ import React from 'react';
 import {
   Redirect,
 } from 'react-router-dom';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
+
+import {
+  Card,
+  Container,
+  Form,
+} from 'semantic-ui-react';
 
 import Session from 'services/session';
 
@@ -13,6 +16,40 @@ export default class Login extends React.Component {
   state = {
     redirectToReferrer: false,
   };
+
+  render() {
+    console.warn('Login render()');
+    const { from } = this.props.location.state || { from: { pathname: "/" } };
+    const { redirectToReferrer } = this.state;
+
+    if (redirectToReferrer || Session.session.isGuest === false) {
+      return <Redirect to={from} />;
+    }
+
+    // <p>You must log in to view the page at {from.pathname}</p>
+    return (
+      <Card.Group centered>
+        <Card>
+          <Card.Content header="Sign In"/>
+          <Card.Content>
+            <Form onSubmit={this.login}>
+              <Form.Field>
+                <label>Username or Email</label>
+                <input id="username" placeholder='Username or Email' />
+              </Form.Field>
+              <Form.Field>
+                <label>Password</label>
+                <input id="password" type="password" placeholder='Password' />
+              </Form.Field>
+              <Container textAlign="center">
+                <Form.Button primary={true} className="center" content="Submit" />
+              </Container>
+            </Form>
+          </Card.Content>
+        </Card>
+      </Card.Group>
+    );
+  }
 
   login = () => {
     const identity = document.getElementById('username').value;
@@ -25,34 +62,4 @@ export default class Login extends React.Component {
         this.setState({ redirectToReferrer: true });
       });
   };
-
-  render() {
-    console.warn('Login render()');
-    const { from } = this.props.location.state || { from: { pathname: "/" } };
-    const { redirectToReferrer } = this.state;
-
-    if (redirectToReferrer || Session.session.isGuest === false) {
-      return <Redirect to={from} />;
-    }
-
-    const style = {
-      width: 300,
-      padding: 20,
-      margin: '20px auto 20px',
-      textAlign: 'center',
-    };
-
-    return (
-      <Paper style={style}>
-        <p>You must log in to view the page at {from.pathname}</p>
-        <div>
-          <TextField type="text" floatingLabelText="Enter your username or email" id="username" />
-        </div>
-        <div>
-          <TextField type="password" floatingLabelText="Enter your password" id="password" />
-        </div>
-        <RaisedButton label="Log in" primary={true} onClick={this.login}/>
-      </Paper>
-    );
-  }
 }
