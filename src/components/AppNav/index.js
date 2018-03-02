@@ -6,6 +6,10 @@ import Divider from 'material-ui/Divider';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 
+import {
+  Dropdown,
+} from 'semantic-ui-react';
+
 import NavLoginButton from './components/NavLoginButton';
 import NavMenu from './components/NavMenu';
 

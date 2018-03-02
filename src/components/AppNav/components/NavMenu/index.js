@@ -1,12 +1,10 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 
-import Avatar from 'material-ui/Avatar';
-import Divider from 'material-ui/Divider';
-import IconButton from 'material-ui/IconButton';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import {
+  Dropdown,
+  Image,
+} from 'semantic-ui-react';
 
 import Session from 'services/session';
 import polymerApi from 'services/polymer-api';
@@ -31,48 +29,57 @@ class NavMenu extends React.Component {
   render() {
     console.warn('NavMenu render()');
     const { history } = this.props;
-    const rightIconStyles = {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    };
+    // const rightIconStyles = {
+    //   display: 'flex',
+    //   justifyContent: 'center',
+    //   alignItems: 'center',
+    // };
+
+    const menuTrigger = (
+      <Image
+        src={this.state.selectedChamp.icon_url}
+        size="mini"
+        circular
+      />
+    );
+
     const champMenuItems = this.state.champions.map((champ) => {
       return (
-        <MenuItem
+        <Dropdown.Item
           key={champ.id}
-          primaryText={champ.name}
-          leftIcon={<Avatar src={champ.icon_url} />}
+          active={this.state.selectedChamp.id === champ.id}
           onClick={() => this.handleChampionSelect(champ)}
-        />
+        >
+          <Image src={champ.icon_url} avatar />
+          <span>{champ.name}</span>
+        </Dropdown.Item>
       );
     });
 
     return (
-      <div style={rightIconStyles}>
-        <Avatar src={this.state.selectedChamp.icon_url} />
-        <IconMenu
-          iconButtonElement={
-            <IconButton><MoreVertIcon color="white" /></IconButton>
-          }
-          targetOrigin={{horizontal: 'right', vertical: 'top'}}
-          anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-        >
+      <Dropdown item direction="left" icon={menuTrigger}>
+        <Dropdown.Menu>
+          <Dropdown.Header>Choose Active Champion</Dropdown.Header>
           {champMenuItems}
-          <Divider />
-          <MenuItem primaryText="Sign Out" onClick={() => {
-            return Session.destroy().then(() => history.push("/"));
-          }} />
-        </IconMenu>
-      </div>
+          <Dropdown.Divider />
+          <Dropdown.Item onClick={this.handleSignOut}>Sign Out</Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
     );
   }
 
   handleChampionSelect = (selectedChamp) => {
-    this.setState({ selectedChamp }, () => {
-      if (this.props.onChampionSelect) {
-        this.props.onChampionSelect(this.state.selectedChamp);
-      }
-    })
+    if (this.state.selectedChamp.id !== selectedChamp.id) {
+      this.setState({ selectedChamp }, () => {
+        if (this.props.onChampionSelect) {
+          this.props.onChampionSelect(this.state.selectedChamp);
+        }
+      });
+    }
+  }
+
+  handleSignOut = () => {
+    return Session.destroy().then(() => history.push("/"));
   }
 }
 
