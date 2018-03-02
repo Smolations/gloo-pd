@@ -57,7 +57,7 @@ class NavMenu extends React.Component {
     });
 
     return (
-      <Dropdown item direction="left" icon={menuTrigger}>
+      <Dropdown item simple direction="left" icon={menuTrigger}>
         <Dropdown.Menu>
           <Dropdown.Header>Choose Active Champion</Dropdown.Header>
           {champMenuItems}
