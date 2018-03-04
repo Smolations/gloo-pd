@@ -2,12 +2,7 @@ import React from 'react';
 
 import {
   Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn,
-} from 'material-ui/Table';
+} from 'semantic-ui-react';
 
 import CohortOverflow from '../CohortOverflow';
 
@@ -35,25 +30,27 @@ class CohortList extends React.Component {
     const tableStyles = { marginTop: '2em' };
 
     const cohorts = this.state.cohorts.map(cohort =>
-      <TableRow key={cohort.id}>
-        <TableRowColumn>{cohort.name}</TableRowColumn>
-        <TableRowColumn>{cohort.cohort_users_count}</TableRowColumn>
-        <TableRowColumn><CohortOverflow cohort={cohort} /></TableRowColumn>
-      </TableRow>
+      <Table.Row key={cohort.id}>
+        <Table.Cell>{cohort.name}</Table.Cell>
+        <Table.Cell>{cohort.cohort_users_count}</Table.Cell>
+        <Table.Cell><CohortOverflow cohort={cohort} /></Table.Cell>
+      </Table.Row>
     );
 
+
     return (
-      <Table headerStyle={tableStyles}>
-        <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
-          <TableRow>
-            <TableHeaderColumn>Cohort Name</TableHeaderColumn>
-            <TableHeaderColumn>User Count</TableHeaderColumn>
-            <TableHeaderColumn>Actions</TableHeaderColumn>
-          </TableRow>
-        </TableHeader>
-        <TableBody displayRowCheckbox={false}>
+      <Table style={tableStyles}>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Cohort Name</Table.HeaderCell>
+            <Table.HeaderCell>User Count</Table.HeaderCell>
+            <Table.HeaderCell>Actions</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
           {cohorts}
-        </TableBody>
+        </Table.Body>
       </Table>
     );
   }
