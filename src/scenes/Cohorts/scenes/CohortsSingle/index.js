@@ -4,8 +4,7 @@ import { withRouter } from 'react-router-dom';
 
 import {
   Tab,
-  Tabs,
-} from 'material-ui/Tabs';
+} from 'semantic-ui-react';
 
 import CohortsSingleView from './scenes/CohortsSingleView';
 import CohortsSingleAssignActions from './scenes/CohortsSingleAssignActions';
@@ -20,7 +19,6 @@ class CohortsSingle extends React.Component {
     cohort: null,
     cohortUsers: [],
     growthRelationships: [],
-    tabValue: 'a',
     shouldRefreshViewActions: false,
   };
 
@@ -30,11 +28,12 @@ class CohortsSingle extends React.Component {
     const cohortId = match.params.cohortId;
 
     const cohortResp = await polymerApi.get(`cohorts/${cohortId}`);
-    const cohortUsersResp = await polymerApi.get(`cohorts/${cohortId}/users`);
 
     if (cohortResp.content.champion_id !== this.props.championId) {
       return history.push('/cohorts');
     }
+
+    const cohortUsersResp = await polymerApi.get(`cohorts/${cohortId}/users`);
 
     const growthRelationships = await Promise.all(cohortUsersResp.content.map(async (user, ndx) => {
       const queryParams = new URLSearchParams({
@@ -90,43 +89,53 @@ class CohortsSingle extends React.Component {
 
   render() {
     console.warn('CohortsSingle render()');
+    const panes = [
+      {
+        menuItem: 'View Cohort Users',
+        render: () => (
+          <Tab.Pane>
+            <CohortsSingleView cohortUsers={this.state.cohortUsers} />
+          </Tab.Pane>
+        ),
+      },
+      {
+        menuItem: 'Assign Growth Action',
+        render: () => (
+          <Tab.Pane>
+            <CohortsSingleAssignActions
+              cohort={this.state.cohort}
+              cohortUsers={this.state.cohortUsers}
+              growthRelationships={this.state.growthRelationships}
+              onAssignment={() => this.setState({ shouldRefreshViewActions: true })}
+            />
+          </Tab.Pane>
+        ),
+      },
+      {
+        menuItem: 'View Growth Actions',
+        render: () => (
+          <Tab.Pane>
+            <CohortsSingleViewActions
+              cohortUsers={this.state.cohortUsers}
+              growthRelationships={this.state.growthRelationships}
+              shouldRefresh={this.state.shouldRefreshViewActions}
+              onRefresh={() => this.setState({ shouldRefreshViewActions: false })}
+            />
+          </Tab.Pane>
+        ),
+      },
+    ]
+
     return this.state.cohort ?
       (
         <div>
           <p>Current Cohort: {this.state.cohort.name}</p>
-          <Tabs
-            value={this.state.tabValue}
-            onChange={this.handleTabChange}
-          >
-            <Tab label="View Cohort Users" value="a">
-              <CohortsSingleView cohortUsers={this.state.cohortUsers} />
-            </Tab>
-            <Tab label="Assign Growth Action" value="b">
-              <CohortsSingleAssignActions
-                cohort={this.state.cohort}
-                cohortUsers={this.state.cohortUsers}
-                growthRelationships={this.state.growthRelationships}
-                onAssignment={() => this.setState({ shouldRefreshViewActions: true })}
-              />
-            </Tab>
-            <Tab label="View Growth Actions" value="c">
-              <CohortsSingleViewActions
-                cohortUsers={this.state.cohortUsers}
-                growthRelationships={this.state.growthRelationships}
-                shouldRefresh={this.state.shouldRefreshViewActions}
-                onRefresh={() => this.setState({ shouldRefreshViewActions: false })}
-              />
-            </Tab>
-          </Tabs>
+          <Tab menu={{ fluid: true, vertical: true, tabular: 'right' }} panes={panes} />
         </div>
       )
       : (
         <p>Loading...</p>
       );
-  }
-
-  handleTabChange = (tabValue) => {
-    this.setState({ tabValue });
   }
 }
 
