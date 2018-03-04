@@ -22,7 +22,8 @@ class UsersTable extends React.Component {
     console.warn('UsersTable render()');
     console.warn('UsersTable render() selected: %o', this.state.selected.slice(0));
 
-    const avatarColumnStyles = { width: '40px' };
+    // accounts for 24px padding on table cells for 40x40 img
+    const avatarColumnStyles = { width: '88px' };
 
     const userRows = this.props.users.map((user, ndx) =>
       <TableRow key={user.id} selected={this.isSelected(ndx)}>

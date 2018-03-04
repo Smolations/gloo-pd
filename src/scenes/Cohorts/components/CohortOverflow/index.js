@@ -3,118 +3,91 @@ import {
   withRouter,
 } from 'react-router-dom';
 
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import IconButton from 'material-ui/IconButton';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import {
+  Button,
+  Dropdown,
+  Icon,
+  Modal,
+} from 'semantic-ui-react';
 
-import CohortUsersList from '../CohortUsersList';
+import UsersTable from 'components/UsersTable';
+
+import polymerApi from 'services/polymer-api';
 
 
 class CohortOverflow extends React.Component {
   state = {
     usersDialogOpen: false,
     growthActionsDialogOpen: false,
+    cohortUsers: [],
+    cohortUsersLoaded: false,
   };
 
   render() {
-    console.warn('CohortList render()');
+    console.warn('CohortOverflow render()');
     const { history } = this.props;
-    const usersDialogActions = [
-      <FlatButton
-        label="OK"
-        primary={true}
-        onClick={() => this.handleClose('users')}
-      />,
-    ];
-
-    const growthActionsDialogActions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onClick={() => this.handleClose('growthActions')}
-      />,
-      <FlatButton
-        label="Submit"
-        primary={true}
-        keyboardFocused={true}
-        onClick={() => this.handleClose('growthActions')}
-      />,
-    ];
-
-    // need the dialog to have access to the list of users in a given cohort.
-    // in order to have the users fetched for a *single* cohort when the
-    // dialog is opened, a new component should be created so lifecycle
-    // hooks can be used.
+    const actionsTrigger = (
+      <Icon name="ellipsis vertical" />
+    );
 
     return (
       <aside>
-        <IconMenu
-          iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-          anchorOrigin={{horizontal: 'left', vertical: 'top'}}
-          targetOrigin={{horizontal: 'left', vertical: 'top'}}
-        >
-          <MenuItem
-            disabled={this.props.cohort.cohort_users_count === 0}
-            primaryText="View Users"
-            onClick={() => this.handleOpen('users')}
-          />
-          <MenuItem
-            disabled={this.props.cohort.cohort_users_count === 0}
-            primaryText="Assign Growth Action"
-            onClick={() => history.push(`/cohorts/${this.props.cohort.id}`)}
-          />
-        </IconMenu>
+        <Dropdown trigger={actionsTrigger} icon={null}>
+          <Dropdown.Menu>
+            <Dropdown.Item
+              disabled={this.props.cohort.cohort_users_count === 0}
+              text="View Users"
+              onClick={this.handleOpen}
+            />
+            <Dropdown.Item
+              disabled={this.props.cohort.cohort_users_count === 0}
+              text="Manage Growth Actions"
+              onClick={() => history.push(`/cohorts/${this.props.cohort.id}`)}
+            />
+          </Dropdown.Menu>
+        </Dropdown>
 
-        <Dialog
-          title={`Users in cohort: ${this.props.cohort.name}`}
-          actions={usersDialogActions}
-          modal={false}
-          open={this.state.usersDialogOpen}
-          onRequestClose={() => this.handleClose('users')}
-          autoScrollBodyContent={true}
-        >
-          <CohortUsersList cohort={this.props.cohort} />
-        </Dialog>
-        <Dialog
-          title={`Assign Growth Action to users in ${this.props.cohort.name}`}
-          actions={growthActionsDialogActions}
-          modal={false}
-          open={this.state.growthActionsDialogOpen}
-          onRequestClose={() => this.handleClose('growthActions')}
-          autoScrollBodyContent={true}
-        >
-          <CohortUsersList cohort={this.props.cohort.id} />
-        </Dialog>
+        <Modal open={this.state.usersDialogOpen}>
+          <Modal.Header>Users in cohort: {this.props.cohort.name}</Modal.Header>
+          <Modal.Content scrolling>
+            <UsersTable users={this.state.cohortUsers} />
+          </Modal.Content>
+          <Modal.Actions>
+            <Button primary={true} onClick={this.handleClose}>OK</Button>
+          </Modal.Actions>
+        </Modal>
       </aside>
     );
   }
 
-  /**
-   *  Handles the opening of all available dialogs using a prefix identifier.
-   *  State props should have the format: `<prefixId>DialogOpen`
-   *  @param {string} prefixId One of: 'users', 'growthActions'
-   */
-  handleOpen = (prefixId) => {
-    const state = {};
-    state[`${prefixId}DialogOpen`] = true;
-    this.setState(state);
-  };
+  handleOpen = () => {
+    const state = {
+      usersDialogOpen: true,
+    };
 
-  /**
-   *  Handles the closing of all available dialogs using a prefix identifier.
-   *  State props should have the format: `<prefixId>DialogOpen`
-   *  @param {string} prefixId One of: 'users', 'growthActions'
-   */
-  handleClose = (prefixId) => {
-    const state = {};
-    state[`${prefixId}DialogOpen`] = false;
+    if (!this.state.cohortUsersLoaded) {
+      this._loadCohortUsers()
+        .then(() => this.setState({ cohortUsersLoaded: true }));
+    }
+
     this.setState(state);
-  };
+  }
+
+  handleClose = () => {
+    this.setState({ usersDialogOpen: false });
+  }
+
+  _loadCohortUsers = (cohortId) => {
+    return polymerApi.get(`cohorts/${this.props.cohort.id}/users`)
+      .then((resp) => {
+        console.log('CohortOverflow cohort users: %o', resp);
+        return resp.content;
+      })
+      .then((cohortUsers) => {
+        console.warn(cohortUsers);
+        this.setState({ cohortUsers });
+      })
+  }
 }
-
-// const CohortOverflow = withRouter(CohortOverflowRouterless);
 
 export default withRouter(CohortOverflow);
