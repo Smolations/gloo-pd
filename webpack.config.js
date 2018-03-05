@@ -2,7 +2,6 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
-  // template: './src/index.html',
   template: './src/index.html.ejs',
   favicon: './src/favicon.ico',
   filename: 'index.html',
@@ -16,6 +15,7 @@ module.exports = {
     path: path.resolve('dist'),
     filename: 'bundle.js',
   },
+  devtool: 'source-map',
   devServer: {
     compress: true,
     contentBase: [

@@ -2,13 +2,16 @@ import React from 'react';
 
 import Avatar from 'material-ui/Avatar';
 import {
-  Table,
+  Table as MTable,
   TableBody,
   TableHeader,
   TableHeaderColumn,
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
+import {
+  Table,
+} from 'semantic-ui-react';
 
 
 class UsersTable extends React.Component {
@@ -25,7 +28,7 @@ class UsersTable extends React.Component {
     // accounts for 24px padding on table cells for 40x40 img
     const avatarColumnStyles = { width: '88px' };
 
-    const userRows = this.props.users.map((user, ndx) =>
+    const mUserRows = this.props.users.map((user, ndx) =>
       <TableRow key={user.id} selected={this.isSelected(ndx)}>
         <TableRowColumn style={avatarColumnStyles}><Avatar src={user.avatar_url} /></TableRowColumn>
         <TableRowColumn>{`${user.first_name} ${user.last_name}`}</TableRowColumn>
@@ -34,9 +37,18 @@ class UsersTable extends React.Component {
       </TableRow>
     );
 
+    const sUserRows = this.props.users.map((user, ndx) =>
+      <Table.Row key={user.id} selected={this.isSelected(ndx)}>
+        <Table.Cell style={avatarColumnStyles}><Avatar src={user.avatar_url} /></Table.Cell>
+        <Table.Cell>{`${user.first_name} ${user.last_name}`}</Table.Cell>
+        <Table.Cell>{user.username}</Table.Cell>
+        <Table.Cell>{user.email}</Table.Cell>
+      </Table.Row>
+    );
+
     // first column will show avatar, so no header needed
-    return (
-      <Table
+    const mUsersTable = (
+      <MTable
         onRowSelection={this.handleRowSelect}
         multiSelectable={!!this.props.onSelect}
       >
@@ -52,10 +64,12 @@ class UsersTable extends React.Component {
           </TableRow>
         </TableHeader>
         <TableBody displayRowCheckbox={!!this.props.onSelect} deselectOnClickaway={false}>
-          {userRows}
+          {mUserRows}
         </TableBody>
-      </Table>
+      </MTable>
     );
+
+    return mUsersTable;
   }
 
   isSelected = (ndx) => {
