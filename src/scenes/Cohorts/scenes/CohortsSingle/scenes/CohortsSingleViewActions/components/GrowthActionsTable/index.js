@@ -2,17 +2,11 @@ import React from 'react';
 
 import {
   Card,
-  CardHeader,
-  CardMedia,
-  CardTitle,
-  CardText,
-} from 'material-ui/Card';
-import {
-  Table,
-  TableBody,
-  TableRow,
-  TableRowColumn,
-} from 'material-ui/Table';
+  Container,
+  Grid,
+  Icon,
+  Image,
+} from 'semantic-ui-react';
 
 import polymerApi from 'services/polymer-api';
 
@@ -83,52 +77,54 @@ class GrowthActionsTable extends React.Component {
           }
 
           return (
-            <Card key={action.id} style={styles.actionCard}>
-              <CardMedia
-                overlay={<CardTitle title={action.linkable.title} subtitle={this._getLinkableType(action.linkable_type)} />}
-              >
-                <img src={action.linkable.banner.src} alt="" />
-              </CardMedia>
-              <CardTitle title={action.title} subtitle={dueAt} />
-              <CardText>
+            <Card key={action.id}>
+              <Image src={action.linkable.banner.src} />
+              <Card.Content>
+                <Card.Header>{action.title}</Card.Header>
+                <Card.Meta>
+                  <span>
+                    {dueAt}
+                  </span>
+                </Card.Meta>
+                <Card.Description>
+                  ({this._getLinkableType(action.linkable_type)}) {action.linkable.title}
+                </Card.Description>
+              </Card.Content>
+              <Card.Content extra>
                 {`${this._getActionStatus(action.status)} / ${this._getActionState(action.state)}`}
-              </CardText>
+              </Card.Content>
             </Card>
-          );
+          )
         });
       }
 
+      const userBanner = user.banner_url || `https://source.unsplash.com/random/${parseInt(styles.userCard.width,10)}x${parseInt(styles.userCard.width,10)/3.27}?foo=${user.id}`;
+
       return (
-        <TableRow key={user.id} displayBorder={false}>
-          <TableRowColumn style={styles.userCardColumn}>
-            <Card style={styles.userCard}>
-              <CardHeader
-                title={`${user.first_name} ${user.last_name}`}
-                subtitle={`@${user.username}`}
-                avatar={user.avatar_url || 'https://thesocietypages.org/socimages/files/2009/05/nopic_192.gif'}
-              />
-              <CardMedia
-                overlay={<CardTitle title={' '} subtitle={' '} />}
-              >
-                <img src={user.banner_url || `https://source.unsplash.com/random/${parseInt(styles.userCard.width,10)}x${parseInt(styles.userCard.width,10)/3.27}?foo=${user.id}`} alt="" />
-              </CardMedia>
+        <Grid.Row key={user.id}>
+          <Grid.Column width={3}>
+            <Card>
+              <Image src={userBanner} />
+              <Card.Content>
+                <Card.Header>{`${user.first_name} ${user.last_name}`}</Card.Header>
+                <Card.Meta>{`@${user.username}`}</Card.Meta>
+                <Card.Description>avatar?</Card.Description>
+              </Card.Content>
             </Card>
-          </TableRowColumn>
-          <TableRowColumn style={styles.actionCardsColumn}>
-            <div style={styles.actionCardsRoot}>
+          </Grid.Column>
+          <Grid.Column width={13}>
+            <Container style={styles.actionCardsRoot}>
               {actionCards}
-            </div>
-          </TableRowColumn>
-        </TableRow>
+            </Container>
+          </Grid.Column>
+        </Grid.Row>
       );
     });
 
     return (
-      <Table multiSelectable={false} style={styles.actionTable}>
-        <TableBody displayRowCheckbox={false}>
-          {userRows}
-        </TableBody>
-      </Table>
+      <Grid columns={2} divided>
+        {userRows}
+      </Grid>
     );
   }
 
@@ -178,26 +174,30 @@ class GrowthActionsTable extends React.Component {
         .then((actions) => {
           const user = this.props.users[ndx];
           // console.log('setting actions map for user:  %o => %o',user, actions);
-          actions.forEach((action) => {
+          return Promise.all(actions.map((action) => {
             action.linkable = { banner: {} };
             switch (action.linkable_type) {
               case 'Collection':
-                polymerApi.get(`collections/${action.linkable_id}`)
+                return polymerApi.get(`collections/${action.linkable_id}`)
                   .then((resp) => {
                     action.linkable = resp.content;
+                    return action;
                   });
                 break;
               case 'Tree':
-                polymerApi.get(`trees/${action.linkable_id}`)
+                return polymerApi.get(`trees/${action.linkable_id}`)
                   .then((resp) => {
                     action.linkable = resp.content;
+                    return action;
                   });
                 break;
               default:
+                return action;
             }
-
-          })
-          userActionsMap[user.id] = actions;
+          }))
+            .then(() => {
+              userActionsMap[user.id] = actions;
+            });
         });
     }))
       .then(() => {
