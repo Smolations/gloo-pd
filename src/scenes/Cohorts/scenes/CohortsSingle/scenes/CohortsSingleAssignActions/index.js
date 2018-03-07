@@ -1,6 +1,9 @@
 import React from 'react';
 
-import RaisedButton from 'material-ui/RaisedButton';
+import {
+  Button,
+  Container,
+} from 'semantic-ui-react';
 
 // probs not the best location for this component...
 import AssignGrowthActionDrawer from 'components/AssignGrowthActionDrawer';
@@ -16,11 +19,6 @@ export default class CohortsSingleAssignActions extends React.Component {
 
   render() {
     console.warn('CohortsSingleAssignActions render()');
-    const assignButtonWrapperStyles = {
-      margin: '35px auto',
-      textAlign: 'center',
-    };
-
     const getButtonText = () => {
       let txt = 'Assign Growth Action';
       switch (this.state.selectedUsers.length) {
@@ -38,26 +36,28 @@ export default class CohortsSingleAssignActions extends React.Component {
     return this.props.cohortUsers ?
       (
         <div>
-          <div style={assignButtonWrapperStyles}>
-            <RaisedButton
+          <Container textAlign="center">
+            <Button
               primary={true}
               disabled={!this.state.selectedUsers.length}
-              label={getButtonText()}
               onClick={this.handleAssignClick}
-            />
-          </div>
+            >
+              {getButtonText()}
+            </Button>
+          </Container>
           <UsersTable
             users={this.props.cohortUsers}
             onSelect={this.handleCohortUsersSelect}
           />
-          <div style={assignButtonWrapperStyles}>
-            <RaisedButton
+          <Container textAlign="center">
+            <Button
               primary={true}
               disabled={!this.state.selectedUsers.length}
-              label={getButtonText()}
               onClick={this.handleAssignClick}
-            />
-          </div>
+            >
+              {getButtonText()}
+            </Button>
+          </Container>
           <AssignGrowthActionDrawer
             open={this.state.open}
             assignees={this.state.selectedUsers}
