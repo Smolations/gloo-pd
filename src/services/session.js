@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import store from 'store';
 import polymerApi from './polymer-api';
 
@@ -10,7 +9,8 @@ const _session = {
 
 const service = {
   get session() {
-    return _.clone(_session);
+    return Object.assign({}, _session);
+    // return _.clone(_session);
   },
   set session(val) {
     console.error('Session.session is read-only!');
@@ -92,8 +92,9 @@ function getCurrentUser() {
  *  @returns {Object} copy of _session
  */
 function _setToken(tokenObj) {
-  if (_.isNull(tokenObj)) {
-    tokenObj = _.mapValues(_session, () => null);
+  if (tokenObj === null) {
+    tokenObj = {};
+    Object.keys(_session).forEach((key) => { tokenObj[key] = null; });
     polymerApi.setToken(null);
     store.remove('userToken');
   } else {
@@ -101,7 +102,7 @@ function _setToken(tokenObj) {
     store.set('userToken', tokenObj.token);
   }
 
-  _.extend(_session, tokenObj);
+  Object.assign(_session, tokenObj);
 
   console.log('_setToken returning: %o', service.session);
   return service.session;

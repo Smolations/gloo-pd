@@ -1,5 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
   template: './src/index.html.ejs',
@@ -40,12 +42,20 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        options: {
+          // presets (babel-preset-env) being set in .babelrc
+          cacheDirectory: true,
+        },
       },
       {
         test: /\.jsx$/,
         loader: 'babel-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        options: {
+          // presets (babel-preset-env) being set in .babelrc
+          cacheDirectory: true,
+        },
       },
       {
         test: /\.css$/,
@@ -55,6 +65,11 @@ module.exports = {
   },
   plugins: [
     HtmlWebpackPluginConfig,
+    new BundleAnalyzerPlugin({
+      analyzerPort: 8889,
+      openAnalyzer: false,
+    }),
+    // new UglifyJSPlugin(),
   ],
   resolve: {
     alias: {

@@ -22,24 +22,7 @@ export default class CohortsSingleView extends React.Component {
     return (
       <React.Fragment>
         <UsersTable users={this.props.cohortUsers} />
-        <MultiSelectTable onRowSelect={this.handleRowSelect}>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell></Table.HeaderCell>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Username</Table.HeaderCell>
-              <Table.HeaderCell>Email</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {rows}
-          </Table.Body>
-        </MultiSelectTable>
       </React.Fragment>
     );
-  }
-
-  handleRowSelect = (...args) => {
-    console.warn('CohortsSingleView handleRowSelect(%o)', args);
   }
 };

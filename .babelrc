@@ -5,7 +5,7 @@
       "targets": {
         // browserlist combined by OR clause
         // https://github.com/ai/browserslist
-        "browsers": ["last 2 versions", "not ie <= 10"],
+        "browsers": ["last 1 Chrome version"],
       },
       "useBuiltIns": "usage",
       "debug": false,
@@ -14,6 +14,7 @@
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-object-rest-spread"
+    "@babel/plugin-proposal-object-rest-spread",
+    "transform-semantic-ui-react-imports",
   ]
 }
