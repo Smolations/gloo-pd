@@ -5,6 +5,7 @@ import {
 } from 'semantic-ui-react';
 
 
+
 export default class Home extends React.Component {
   render() {
     console.warn('Home render()');
