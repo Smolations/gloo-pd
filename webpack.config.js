@@ -65,10 +65,10 @@ module.exports = {
   },
   plugins: [
     HtmlWebpackPluginConfig,
-    new BundleAnalyzerPlugin({
-      analyzerPort: 8889,
-      openAnalyzer: false,
-    }),
+    // new BundleAnalyzerPlugin({
+    //   analyzerPort: 8887,
+    //   openAnalyzer: false,
+    // }),
     // new UglifyJSPlugin(),
   ],
   resolve: {
