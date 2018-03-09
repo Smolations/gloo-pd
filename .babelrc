@@ -10,7 +10,8 @@
       "useBuiltIns": "usage",
       "debug": false,
     }],
-    "@babel/react"
+    "@babel/react",
+    "@lingui/babel-preset-react",
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties",

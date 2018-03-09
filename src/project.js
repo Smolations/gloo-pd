@@ -5,6 +5,9 @@ import {
 } from 'react-router-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
+import { I18nProvider } from '@lingui/react';
+import catalog from '../locale/en/messages.js';
+
 import AppNav from 'components/AppNav';
 
 import Cohorts from './scenes/Cohorts';
@@ -25,14 +28,16 @@ export default class Project extends React.Component {
     return (
       <MuiThemeProvider>
         <Router>
-          <main>
-            <AppNav onChampionSelect={this.handleChampionSelect} />
-            <section id="routeContainer">
-              <Route exact path="/" component={Home} />
-              <Route path="/login" component={Login} />
-              <PrivateRoute path="/cohorts" component={Cohorts} componentProps={{ championId: this.state.currentChampion.id }} />
-            </section>
-          </main>
+          <I18nProvider language="en" catalogs={{ en: catalog }}>
+            <main>
+              <AppNav onChampionSelect={this.handleChampionSelect} />
+              <section id="routeContainer">
+                <Route exact path="/" component={Home} />
+                <Route path="/login" component={Login} />
+                <PrivateRoute path="/cohorts" component={Cohorts} componentProps={{ championId: this.state.currentChampion.id }} />
+              </section>
+            </main>
+          </I18nProvider>
         </Router>
       </MuiThemeProvider>
     );

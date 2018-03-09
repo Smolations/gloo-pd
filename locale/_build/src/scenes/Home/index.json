@@ -1,0 +1,44 @@
+{
+  "{0, plural, =0 {There are no problems} one {There is # problem} other {There are # problems}}": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        27
+      ]
+    ]
+  },
+  "Harnessing Growth Energy": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        52
+      ]
+    ]
+  },
+  "add_a_member_to_your_organization": {
+    "defaults": "default text",
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        69
+      ]
+    ]
+  },
+  "remove_user_from_champion": {
+    "defaults": "default text",
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        75
+      ]
+    ]
+  },
+  "Here's a new Date object: {0,date}": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        92
+      ]
+    ]
+  }
+}
