@@ -1,9 +1,9 @@
 {
-  "{0, plural, =0 {There are no problems} one {There is # problem} other {There are # problems}}": {
+  "{0, plural, =0 {There are no problems.} one {There is # problem.} other {There are # problems.}}": {
     "origin": [
       [
         "src/scenes/Home/index.js",
-        27
+        30
       ]
     ]
   },
@@ -11,7 +11,7 @@
     "origin": [
       [
         "src/scenes/Home/index.js",
-        52
+        60
       ]
     ]
   },
@@ -20,7 +20,7 @@
     "origin": [
       [
         "src/scenes/Home/index.js",
-        69
+        77
       ]
     ]
   },
@@ -29,7 +29,7 @@
     "origin": [
       [
         "src/scenes/Home/index.js",
-        75
+        83
       ]
     ]
   },
@@ -37,7 +37,55 @@
     "origin": [
       [
         "src/scenes/Home/index.js",
-        92
+        100
+      ]
+    ]
+  },
+  "What is it about <0>GitHub</0>? Do you {emotion} it?": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        106
+      ]
+    ]
+  },
+  "{count, plural, one {I can think of at least # thing, ${name}} other {I can think of at least <0>#</0> things, {name}}}": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        114
+      ]
+    ]
+  },
+  "<0>Click here</0> if you want to see nothing <1/>and <2>click here</2> to visit this demo's project page.": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        124
+      ]
+    ]
+  },
+  "Smola's React Professional Development Project": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        126
+      ]
+    ]
+  },
+  "Have you read {gender, select, male {his} female {her} other {their}} book?": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        134
+      ]
+    ]
+  },
+  "I came in {count, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place.": {
+    "origin": [
+      [
+        "src/scenes/Home/index.js",
+        149
       ]
     ]
   }

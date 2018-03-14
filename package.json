@@ -33,6 +33,7 @@
     "webpack-bundle-analyzer": "^2.11.1"
   },
   "lingui": {
-    "format": "minimal"
+    "format": "minimal",
+    "sourceLocale": "en"
   }
 }

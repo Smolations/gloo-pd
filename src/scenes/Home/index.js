@@ -2,6 +2,8 @@ import React from 'react';
 import {
   DateFormat,
   Plural,
+  Select,
+  SelectOrdinal,
   Trans,
   withI18n,
 } from '@lingui/react';
@@ -46,8 +48,13 @@ class PluralsTest extends React.Component {
 
 class Home extends React.Component {
   render() {
-    const { i18n } = this.props;
     console.warn('Home render()');
+    const { i18n } = this.props;
+    const name = 'Holmes';
+    const gender = 'female';
+    const count = 3;
+    const emotion = 'love';
+
     return (
       <>
         <Header size="huge" content="Dam Jena" subheader={i18n.t`Harnessing Growth Energy`} />
@@ -82,20 +89,75 @@ class Home extends React.Component {
               </Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell>testing extraction with plurals</Table.Cell>
+              <Table.Cell>testing extraction with &lt;Plural/&gt;</Table.Cell>
               <Table.Cell>
                 <PluralsTest />
               </Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell>using DateFormat</Table.Cell>
+              <Table.Cell>using &lt;DateFormat/&gt;</Table.Cell>
               <Table.Cell>
                 <Trans>Here's a new Date object: <DateFormat value={new Date()}/></Trans>
               </Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell></Table.Cell>
-              <Table.Cell></Table.Cell>
+              <Table.Cell>extraction with nested components and values</Table.Cell>
+              <Table.Cell>
+                <Trans>
+                  What is it about <a href="https://github.com">GitHub</a>? Do you {emotion} it?
+                </Trans>
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell>extraction with plurals and nested components/values</Table.Cell>
+              <Table.Cell>
+                <Plural
+                  value={count}
+                  one="I can think of at least # thing, ${name}"
+                  other={<Trans>I can think of at least <strong>#</strong> things, {name}</Trans>}
+               />
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell>extraction with nested components and using i18n.t. also using similar translation with different casing</Table.Cell>
+              <Table.Cell>
+                <Trans>
+                  <Button secondary={true}>Click here</Button> if you want to see nothing <br/>
+                  and <a title={i18n.t`Smola's React Professional Development Project`} href="https://github.com/Smolations/gloo-pd">click here</a> to visit
+                  this demo's project page.
+                </Trans>
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell>extraction using &lt;Select/&gt;</Table.Cell>
+              <Table.Cell>
+                <Trans>
+                  Have you read
+                  <Select
+                    value={gender}
+                    male="his"
+                    female="her"
+                    other="their"
+                  />
+                  book?
+                </Trans>
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell>extraction using &lt;SelectOrdinal/&gt;</Table.Cell>
+              <Table.Cell>
+                <Trans>
+                  I came in
+                  <SelectOrdinal
+                      value={count}
+                      one="#st"
+                      two="#nd"
+                      few="#rd"
+                      other="#th"
+                  />
+                  place.
+                </Trans>
+              </Table.Cell>
             </Table.Row>
           </Table.Body>
         </Table>
